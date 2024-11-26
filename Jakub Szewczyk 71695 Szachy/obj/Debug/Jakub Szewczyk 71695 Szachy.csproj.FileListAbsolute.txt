@@ -1,0 +1,7 @@
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\bin\Debug\Jakub_Szewczyk_71695_Szachy.exe
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\bin\Debug\Jakub_Szewczyk_71695_Szachy.pdb
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\obj\Debug\Jakub Szewczyk 71695 Szachy.csproj.AssemblyReference.cache
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\obj\Debug\Jakub Szewczyk 71695 Szachy.csproj.SuggestedBindingRedirects.cache
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\obj\Debug\Jakub Szewczyk 71695 Szachy.csproj.CoreCompileInputs.cache
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\obj\Debug\Jakub_Szewczyk_71695_Szachy.exe
+C:\Users\Jakub\RiderProjects\Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy\obj\Debug\Jakub_Szewczyk_71695_Szachy.pdb
