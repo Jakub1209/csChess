@@ -327,6 +327,10 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "R")
             {
+                int maximumXvalue = 0;
+                int maximumYvalue = 0;
+                int minimumXvalue = 0;
+                int minimumYvalue = 0;
                 // create a table with possible moves
                 for (int row = 0; row < 19; row++)
                 { 
@@ -334,31 +338,108 @@ namespace Jakub_Szewczyk_71695_Szachy
                     {
                         if (
                             (column == moveInIntArray[1] || row == moveInIntArray[0])
-                            && (player1Cords[row, column] != "x" && player2Cords[row, column] != "x")
                             && (row > 1 && row < 17 && row % 2 == 0)
                             && (column > 1 && column < 17 && column % 2 == 0)
                         )
                         {
-                            possibleMoves[row, column] = "x";
+                            if (player1Cords[row, column] == "x")
+                                possibleMoves[row, column] = "A";
+                            else if (player2Cords[row, column] == "x")
+                                possibleMoves[row, column] = "E";
+                            else
+                                possibleMoves[row, column] = "x";
                         }
                         else
                             possibleMoves[row, column] = "0";
-                        Console.Write(possibleMoves[row, column]);
                     }
-                    Console.WriteLine();
                 }
-                // check if nothing blocks me in horizontal direction:
-                // if (moveInIntArray[1] == moveInIntArray[3])
-                // {
-                //     for (int row = moveInIntArray[0]; row < 19; row++)
-                //     {
-                //         for (int column = moveInIntArray[1]; column < 19; column++)
-                //         {
-                //             
-                //         }
-                //     }
-                // }
                 
+                while (maximumXvalue == 0 && minimumXvalue == 0)
+                {
+                    for (int column = moveInIntArray[1]; column < 17; column++) //max value X
+                    {
+                        if (possibleMoves[moveInIntArray[0], column] == "A" && maximumXvalue == 0)
+                        {
+                            maximumXvalue = column - 2;
+                        }
+                        else if (possibleMoves[moveInIntArray[0], column] == "E" && maximumXvalue == 0)
+                        {
+                            maximumXvalue = column;
+                        }
+                    }
+                    if (maximumXvalue == 0)
+                        maximumXvalue = 18;
+                    
+                    for (int column = moveInIntArray[1]; column < 1; column--) //min value x
+                    {
+                        if (possibleMoves[moveInIntArray[0], column] == "A" && minimumXvalue == 0)
+                        {
+                            minimumXvalue = column + 2;
+                        }
+                        else if ((possibleMoves[moveInIntArray[0], column] == "E" || possibleMoves[moveInIntArray[0], column] == "x") && minimumXvalue == 0)
+                        {
+                            minimumXvalue = column;
+                        }
+                    }
+                    if (minimumXvalue == 0)
+                        minimumXvalue = 2;
+                }
+                
+                while (maximumYvalue == 0)
+                {
+                    for (int row = moveInIntArray[0] - 1; row > 1; row--) //max value y
+                    {
+                        if (possibleMoves[row, moveInIntArray[1]] == "A" && maximumYvalue == 0)
+                        {
+                            maximumYvalue = row - 2;
+                        }
+                        else if (possibleMoves[row, moveInIntArray[1]] == "E" && maximumYvalue == 0)
+                        {
+                            maximumYvalue = row;
+                        }
+                    }
+                    if (maximumYvalue == 0)
+                        maximumYvalue = 18;
+                    
+                    for (int row = moveInIntArray[0] - 1; row < 17; row++) //min value y
+                    {
+                        if (possibleMoves[row, moveInIntArray[1]] == "A" && minimumYvalue == 0)
+                        {
+                            minimumYvalue = row + 2;
+                        }
+                        else if ((possibleMoves[row, moveInIntArray[1]] == "E" || possibleMoves[row, moveInIntArray[1]] == "x") && minimumYvalue == 0)
+                        {
+                            minimumYvalue = row;
+                        }
+                    }
+                    if (minimumYvalue == 0)
+                        minimumYvalue = 2;
+                }
+
+                Console.WriteLine($"i wanna go to x: {moveInIntArray[3]}, y: {moveInIntArray[2]}");
+                Console.WriteLine($" x max: {maximumXvalue}, x min: {minimumXvalue}, y max: {maximumYvalue} y min: {minimumYvalue}");
+                if (
+                    moveInIntArray[3] >= minimumXvalue
+                    && moveInIntArray[3] <= maximumXvalue
+                    && moveInIntArray[2] <= minimumYvalue
+                    && moveInIntArray[2] >= maximumYvalue
+                )
+                {
+                    return true;
+                }
+    
+            }
+            else if (pawn == "N")
+            {
+                return true;
+            }
+            else if (pawn == "B")
+            {
+                return true;
+            }
+            else if (pawn == "Q")
+            {
+                return true;
             }
             return false;
         }
