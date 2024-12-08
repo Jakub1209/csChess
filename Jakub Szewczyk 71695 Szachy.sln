@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jakub Szewczyk 71695 Szachy", "Jakub Szewczyk 71695 Szachy\Jakub Szewczyk 71695 Szachy.csproj", "{A79F3AD6-BA2B-4424-804F-FF795E59F97B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A79F3AD6-BA2B-4424-804F-FF795E59F97B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A79F3AD6-BA2B-4424-804F-FF795E59F97B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A79F3AD6-BA2B-4424-804F-FF795E59F97B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A79F3AD6-BA2B-4424-804F-FF795E59F97B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
