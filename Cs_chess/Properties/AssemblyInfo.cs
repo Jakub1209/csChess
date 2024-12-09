@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cs_chess")]
+[assembly: AssemblyTitle("Jakub_Szewczyk_71695_Szachy")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Cs_chess")]
+[assembly: AssemblyProduct("Jakub_Szewczyk_71695_Szachy")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("26B19833-5102-46DD-BAB8-DBBFCF00CD86")]
+[assembly: Guid("A79F3AD6-BA2B-4424-804F-FF795E59F97B")]
 
 // Version information for an assembly consists of the following four values:
 //
