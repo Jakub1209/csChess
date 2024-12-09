@@ -178,6 +178,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 int[] moveInIntArray = GetMoveFromPlayer();
                 string chosenPawn = _chessBoard[moveInIntArray[0], moveInIntArray[1]];
                 string[,] currentPlayersCoordinates = playerNumber == 1 ? _player1Coordinates : _player2Coordinates;
+                string[,] opponentCoordinates = playerNumber != 1 ? _player2Coordinates : _player1Coordinates;
                 
                 // if the pawn has a legal move, only then you can move it.
                 
@@ -186,6 +187,12 @@ namespace Jakub_Szewczyk_71695_Szachy
                 {
                     currentPlayersCoordinates[moveInIntArray[0], moveInIntArray[1]] = " ";
                     currentPlayersCoordinates[moveInIntArray[2], moveInIntArray[3]] = "x";
+
+                    if (currentPlayersCoordinates[moveInIntArray[2], moveInIntArray[3]]
+                        == opponentCoordinates[moveInIntArray[2], moveInIntArray[3]])
+                    {
+                        opponentCoordinates[moveInIntArray[2], moveInIntArray[3]] = " ";
+                    }
 
                     Console.WriteLine($"{moveInIntArray[0]} {moveInIntArray[1]} {moveInIntArray[2]} {moveInIntArray[3]}");
             
