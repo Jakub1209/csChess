@@ -510,7 +510,37 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "B")
             {
-                return true;
+                Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
+                //generate legal moves for every diagonal
+                //generate maxXandMaxY - right and downside of board
+                for (int i = 2; i < 17; i += 2)
+                {
+                    Console.WriteLine("1");
+                    if (moveInIntArray[0] <= 16 && moveInIntArray[1] <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                }
+                //generate maxXandMinY - right and upside of board
+                for (int i = moveInIntArray[1]; i < 17; i += 2)
+                {
+                    Console.WriteLine("2");
+                    possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                }
+                //generate mixXandMaxY - left and downside of board
+                for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                {
+                    Console.WriteLine("3");
+                    possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
+                }
+                //generate mixXandMinY - left and upside of board
+                for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                {
+                    Console.WriteLine("4");
+                    possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
+                }
+                //if the move is in the table with possible moves, then move
+                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
+                return false;
             }
             else if (pawn == "Q")
             {
