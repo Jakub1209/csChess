@@ -314,7 +314,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             string[,] opponentCords = turnNumber % 2 == 0 ? player2Cords : player1Cords;
             string[,] currentPLayersCords = turnNumber % 2 == 0 ? player1Cords : player2Cords;
             string[,] possibleMoves = new string[19, 19];
-            int[] maxPositions = new int[3];
+            int[] maxPositions = new int[4];
             if (pawn == "P")
             {
                 if (
@@ -393,7 +393,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         break;
                     }
                 }
-                // if there are no enemies or allies, max boundary on the left side is 2
+                //if there are no enemies or allies, max boundary on the left side is 2
                 if (maxPositions[0] == 0) maxPositions[0] = 2;
                 //generate maxX
                 for (int i = moveInIntArray[1]; i < 17; i += 2)
@@ -411,12 +411,55 @@ namespace Jakub_Szewczyk_71695_Szachy
                         break;
                     }
                 }
-                // if there are no enemies or allies, max boundary on the right side is 18
+                //if there are no enemies or allies, max boundary on the right side is 16
                 if (maxPositions[1] == 0) maxPositions[1] = 16;
-
-                Console.WriteLine($"{maxPositions[0]}, {maxPositions[1]}");
-
-                return true;
+                //generate minY
+                for (int i = moveInIntArray[0]; i > 2; i -= 2)
+                {
+                    if (possibleMoves[i, moveInIntArray[1]] == "E")
+                    {
+                        //if the piece sees an enemy, the last field to attack can only be the enemy
+                        maxPositions[2] = i;
+                        break;
+                    }
+                    if (possibleMoves[i, moveInIntArray[1]] == "A")
+                    {
+                        //if the piece sees an ally, the last legal field is one to the right
+                        maxPositions[2] = i + 2;
+                        break;
+                    }
+                }
+                //if there are no enemies or allies, max boundary on the upside is 2
+                if (maxPositions[2] == 0) maxPositions[2] = 2;
+                //generate maxY
+                for (int i = moveInIntArray[0]; i < 17; i += 2)
+                {
+                    if (possibleMoves[i, moveInIntArray[1]] == "E")
+                    {
+                        //if the piece sees an enemy, the last field to attack can only be the enemy
+                        maxPositions[3] = i;
+                        break;
+                    }
+                    if (possibleMoves[i, moveInIntArray[1]] == "A")
+                    {
+                        //if the piece sees an ally, the last legal field is one to the right
+                        maxPositions[3] = i - 2;
+                        break;
+                    }
+                }
+                //if there are no enemies or allies, max boundary on the downside is 16
+                if (maxPositions[3] == 0) maxPositions[3] = 16;
+                //if the move is in the bounds of the max coordinates, it means you can move the piece
+                if (moveInIntArray[2] >= maxPositions[2] //if the row number is greater than or equal minY
+                    && moveInIntArray[2] <= maxPositions[3] //and it's smaller or equal to maxY
+                    && moveInIntArray[3] >= maxPositions[0] //and the column number is greater than or equal minX
+                    && moveInIntArray[3] <= maxPositions[1]) //and it's smaller or equal to maxX
+                    return true;
+                else
+                {
+                    Console.WriteLine("This move is out of bounds! You cannot move your rook there!");
+                    return false;
+                }
             }
             else if (pawn == "N")
             {
