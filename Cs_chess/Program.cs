@@ -312,6 +312,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             int rowDifference = Math.Abs(moveInIntArray[0] - moveInIntArray[2]);
             int columnDifference = Math.Abs(moveInIntArray[1] - moveInIntArray[3]);
             string[,] opponentCords = turnNumber % 2 == 0 ? player2Cords : player1Cords;
+            string[,] currentPLayersCords = turnNumber % 2 == 0 ? player1Cords : player2Cords;
             string[,] possibleMoves = new string[19, 19];
             if (pawn == "P")
             {
@@ -336,9 +337,9 @@ namespace Jakub_Szewczyk_71695_Szachy
             else if (pawn == "R")
             {
                 //generate table with every legal move
-                for (int row = 0; row < 19; row++) //create rows
+                for (int row = 2; row < 17; row += 2) //create rows
                 {
-                    for (int col = 0; col < 19; col++) //create columns
+                    for (int col = 2; col < 17; col += 2) //create columns
                     {
                         //fill in all empty slots as 0
                         possibleMoves[row, col] = "0";
@@ -348,10 +349,21 @@ namespace Jakub_Szewczyk_71695_Szachy
                         {
                             possibleMoves[row, col] = "x";
                         }
-                        //fill in the row in which it currently is
-                        if (moveInIntArray[0] == row)
+                        // fill in the row in which the piece currently is
+                         if (moveInIntArray[0] == row)
                         {
                             possibleMoves[row, col] = "x";
+                        }
+
+                        // mark the enemy as E
+                        if (opponentCords[row, col] == "x")
+                        {
+                            possibleMoves[row, col] = "E";
+                        }
+                        // mark the ally as A
+                        if (currentPLayersCords[row, col] == "x")
+                        {
+                            possibleMoves[row, col] = "A";
                         }
                         
                         Console.Write(possibleMoves[row, col]);
