@@ -381,10 +381,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         {
                             possibleMoves[row, col] = "0";
                         }
-                        
-                        Console.Write(possibleMoves[row, col]);
                     }
-                    Console.WriteLine();
                 }
                 //look for the max position in every direction
                 //generate minX
@@ -473,7 +470,43 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "N")
             {
-                return true;
+                //generate table possibleMoves with every legal move
+                for (int row = moveInIntArray[1] - 4; row <= moveInIntArray[1] + 4; row++) //check the rows
+                {
+                    //if the rows are on the chessboard
+                    if (row >= 2 && row <= 16)
+                    {
+                        //for the moves 2 places to the left
+                        if (row == moveInIntArray[1] - 4)
+                        {
+                            if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 2] = "x";
+                            if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 2] = "x";
+                        }
+                        //for the moves 1 place to the left
+                        if (row == moveInIntArray[1] - 2)
+                        {
+                            if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 4] = "x";
+                            if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 4] = "x";
+                        }
+                        //for the moves 2 places to the right
+                        if (row == moveInIntArray[1] + 4)
+                        {
+                            if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 2] = "x";
+                            if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 2] = "x";
+                        }
+                        //for the moves 1 place to the right
+                        if (row == moveInIntArray[1] + 2)
+                        {
+                            if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 4] = "x";
+                            if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 4] = "x";
+                        }
+                    }
+                }
+                //if the move is in the table with possible moves, then move
+                if (possibleMoves[moveInIntArray[3], moveInIntArray[2]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your knight! You cannot move there!");
+                return false;
             }
             else if (pawn == "B")
             {
