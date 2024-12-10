@@ -49,7 +49,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             in every other odd rows or columns, there is a building block - "-" or "|",
             in every even row and column, there is either a pawn, or a blank space left.
             */
-            string[] numbers = { "1", "2", "3", "4", "5", "6", "7", "8 " };
+            string[] numbers = { "1", "2", "3", "4", "5", "6", "7", "8" };
             int numberCounter = 7; 
             string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
             int letterCounter = 0;
@@ -314,6 +314,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             string[,] opponentCords = turnNumber % 2 == 0 ? player2Cords : player1Cords;
             string[,] currentPLayersCords = turnNumber % 2 == 0 ? player1Cords : player2Cords;
             string[,] possibleMoves = new string[19, 19];
+            int[] maxPositions = new int[3];
             if (pawn == "P")
             {
                 if (
@@ -336,7 +337,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "R")
             {
-                //generate table with every legal move
+                //generate table possibleMoves with every legal move
                 for (int row = 2; row < 17; row += 2) //create rows
                 {
                     for (int col = 2; col < 17; col += 2) //create columns
@@ -365,11 +366,55 @@ namespace Jakub_Szewczyk_71695_Szachy
                         {
                             possibleMoves[row, col] = "A";
                         }
+                        // mark the piece as an inaccessible field - 0
+                        if (moveInIntArray[0] == row && moveInIntArray[1] == col)
+                        {
+                            possibleMoves[row, col] = "0";
+                        }
                         
                         Console.Write(possibleMoves[row, col]);
                     }
                     Console.WriteLine();
                 }
+                //look for the max position in every direction
+                //generate minX
+                for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                {
+                    if (possibleMoves[moveInIntArray[0], i] == "E")
+                    {
+                        //if the piece sees an enemy, the last field to attack can only be the enemy
+                        maxPositions[0] = i;
+                        break;
+                    }
+                    if (possibleMoves[moveInIntArray[0], i] == "A")
+                    {
+                        //if the piece sees an ally, the last legal field is one to the right
+                        maxPositions[0] = i + 2;
+                        break;
+                    }
+                }
+                // if there are no enemies or allies, max boundary on the left side is 2
+                if (maxPositions[0] == 0) maxPositions[0] = 2;
+                //generate maxX
+                for (int i = moveInIntArray[1]; i < 17; i += 2)
+                {
+                    if (possibleMoves[moveInIntArray[0], i] == "E")
+                    {
+                        //if the piece sees an enemy, the last field to attack can only be the enemy
+                        maxPositions[1] = i;
+                        break;
+                    }
+                    if (possibleMoves[moveInIntArray[0], i] == "A")
+                    {
+                        //if the piece sees an ally, the last legal field is one to the right
+                        maxPositions[1] = i - 2;
+                        break;
+                    }
+                }
+                // if there are no enemies or allies, max boundary on the right side is 18
+                if (maxPositions[1] == 0) maxPositions[1] = 16;
+
+                Console.WriteLine($"{maxPositions[0]}, {maxPositions[1]}");
 
                 return true;
             }
