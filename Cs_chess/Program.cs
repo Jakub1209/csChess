@@ -302,12 +302,12 @@ namespace Jakub_Szewczyk_71695_Szachy
         }
 
         static bool PawnMoveIsLegal(
-            int[] moveInIntArray, 
-            string pawn, 
-            string[,] player1Cords, 
-            string[,] player2Cords, 
+            int[] moveInIntArray,
+            string pawn,
+            string[,] player1Cords,
+            string[,] player2Cords,
             int turnNumber
-            )
+        )
         {
             int rowDifference = Math.Abs(moveInIntArray[0] - moveInIntArray[2]);
             int columnDifference = Math.Abs(moveInIntArray[1] - moveInIntArray[3]);
@@ -317,23 +317,33 @@ namespace Jakub_Szewczyk_71695_Szachy
             int[] maxPositions = new int[4];
             if (pawn == "P")
             {
-                if (
-                    rowDifference <= 4 
-                    && (moveInIntArray[0] == 14 || moveInIntArray[0] == 4) 
-                    && columnDifference == 0
+                //checking if the pawn doesn't move backwards - for player1 the difference should be negative
+                if ((turnNumber % 2 == 0 && moveInIntArray[2] - moveInIntArray[0] < 0)
+                    || (turnNumber % 2 == 1 && moveInIntArray[2] - moveInIntArray[0] > 0))
+                {
+                    if (
+                        rowDifference <= 4 //if the pawn wants tp move two tiles
+                        && (moveInIntArray[0] == 14 || moveInIntArray[0] == 4) //and it's on the correct starting position
+                        && columnDifference == 0 //and it doesn't want to move sideways
                     )
-                    return true;
-                if (
-                    rowDifference == 2 
-                    && (
-                        (columnDifference == 0
-                         && player1Cords[moveInIntArray[2], moveInIntArray[3]] != "x" 
-                         && player2Cords[moveInIntArray[2], moveInIntArray[3]] != "x") 
-                        || 
-                        (columnDifference == 2 
-                         && opponentCords[moveInIntArray[2], moveInIntArray[3]] == "x"))
+                        return true;
+                    if (
+                        rowDifference == 2 
+                        && (
+                            (columnDifference == 0
+                             && player1Cords[moveInIntArray[2], moveInIntArray[3]] != "x" 
+                             && player2Cords[moveInIntArray[2], moveInIntArray[3]] != "x") 
+                            || 
+                            (columnDifference == 2 
+                             && opponentCords[moveInIntArray[2], moveInIntArray[3]] == "x"))
                     )
-                    return true;
+                        return true;
+                }
+                else
+                {
+                    Console.WriteLine("You cannot move backwards dumbass!");
+                    return false;
+                }
             }
             else if (pawn == "R")
             {
