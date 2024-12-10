@@ -49,7 +49,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             in every other odd rows or columns, there is a building block - "-" or "|",
             in every even row and column, there is either a pawn, or a blank space left.
             */
-            string[] numbers = { "1", "2", "3", "4", "5", "6", "7", "8" };
+            string[] numbers = { "1", "2", "3", "4", "5", "6", "7", "8 " };
             int numberCounter = 7; 
             string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
             int letterCounter = 0;
@@ -162,6 +162,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             {
                 int playerNumber = turnNumber % 2 + 1;
 
+                
                 // Console.Clear();
                 Console.WriteLine($"It is player{playerNumber}'s turn! \n");
                 PrintChessBoard(_chessBoard);
@@ -178,7 +179,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 int[] moveInIntArray = GetMoveFromPlayer();
                 string chosenPawn = _chessBoard[moveInIntArray[0], moveInIntArray[1]];
                 string[,] currentPlayersCoordinates = playerNumber == 1 ? _player1Coordinates : _player2Coordinates;
-                string[,] opponentCoordinates = playerNumber != 1 ? _player2Coordinates : _player1Coordinates;
+                string[,] opponentCoordinates = playerNumber == 1 ? _player2Coordinates : _player1Coordinates;
                 
                 // if the pawn has a legal move, only then you can move it.
                 
@@ -334,107 +335,31 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "R")
             {
-                int maximumXvalue = 0;
-                int maximumYvalue = 0;
-                int minimumXvalue = 0;
-                int minimumYvalue = 0;
-                // create a table with possible moves
-                for (int row = 0; row < 19; row++)
-                { 
-                    for (int column = 0; column < 19; column++)
-                    {
-                        if (
-                            (column == moveInIntArray[1] || row == moveInIntArray[0])
-                            && (row > 1 && row < 17 && row % 2 == 0)
-                            && (column > 1 && column < 17 && column % 2 == 0)
-                        )
-                        {
-                            if (player1Cords[row, column] == "x")
-                                possibleMoves[row, column] = "A";
-                            else if (player2Cords[row, column] == "x")
-                                possibleMoves[row, column] = "E";
-                            else
-                                possibleMoves[row, column] = "x";
-                        }
-                        else
-                            possibleMoves[row, column] = "0";
-                    }
-                }
-                
-                while (maximumXvalue == 0 && minimumXvalue == 0)
+                //generate table with every legal move
+                for (int row = 0; row < 19; row++) //create rows
                 {
-                    for (int column = moveInIntArray[1]; column < 17; column++) //max value X
+                    for (int col = 0; col < 19; col++) //create columns
                     {
-                        if (possibleMoves[moveInIntArray[0], column] == "A" && maximumXvalue == 0)
+                        //fill in all empty slots as 0
+                        possibleMoves[row, col] = "0";
+                        
+                        //fill in the column in which the piece is sitting
+                        if (moveInIntArray[1] == col)
                         {
-                            maximumXvalue = column - 2;
+                            possibleMoves[row, col] = "x";
                         }
-                        else if (possibleMoves[moveInIntArray[0], column] == "E" && maximumXvalue == 0)
+                        //fill in the row in which it currently is
+                        if (moveInIntArray[0] == row)
                         {
-                            maximumXvalue = column;
+                            possibleMoves[row, col] = "x";
                         }
+                        
+                        Console.Write(possibleMoves[row, col]);
                     }
-                    if (maximumXvalue == 0)
-                        maximumXvalue = 18;
-                    
-                    for (int column = moveInIntArray[1]; column < 1; column--) //min value x
-                    {
-                        if (possibleMoves[moveInIntArray[0], column] == "A" && minimumXvalue == 0)
-                        {
-                            minimumXvalue = column + 2;
-                        }
-                        else if ((possibleMoves[moveInIntArray[0], column] == "E" || possibleMoves[moveInIntArray[0], column] == "x") && minimumXvalue == 0)
-                        {
-                            minimumXvalue = column;
-                        }
-                    }
-                    if (minimumXvalue == 0)
-                        minimumXvalue = 2;
-                }
-                
-                while (maximumYvalue == 0)
-                {
-                    for (int row = moveInIntArray[0] - 1; row > 1; row--) //max value y
-                    {
-                        if (possibleMoves[row, moveInIntArray[1]] == "A" && maximumYvalue == 0)
-                        {
-                            maximumYvalue = row - 2;
-                        }
-                        else if (possibleMoves[row, moveInIntArray[1]] == "E" && maximumYvalue == 0)
-                        {
-                            maximumYvalue = row;
-                        }
-                    }
-                    if (maximumYvalue == 0)
-                        maximumYvalue = 18;
-                    
-                    for (int row = moveInIntArray[0] - 1; row < 17; row++) //min value y
-                    {
-                        if (possibleMoves[row, moveInIntArray[1]] == "A" && minimumYvalue == 0)
-                        {
-                            minimumYvalue = row + 2;
-                        }
-                        else if ((possibleMoves[row, moveInIntArray[1]] == "E" || possibleMoves[row, moveInIntArray[1]] == "x") && minimumYvalue == 0)
-                        {
-                            minimumYvalue = row;
-                        }
-                    }
-                    if (minimumYvalue == 0)
-                        minimumYvalue = 2;
+                    Console.WriteLine();
                 }
 
-                Console.WriteLine($"i wanna go to x: {moveInIntArray[3]}, y: {moveInIntArray[2]}");
-                Console.WriteLine($" x max: {maximumXvalue}, x min: {minimumXvalue}, y max: {maximumYvalue} y min: {minimumYvalue}");
-                if (
-                    moveInIntArray[3] >= minimumXvalue
-                    && moveInIntArray[3] <= maximumXvalue
-                    && moveInIntArray[2] <= minimumYvalue
-                    && moveInIntArray[2] >= maximumYvalue
-                )
-                {
-                    return true;
-                }
-    
+                return true;
             }
             else if (pawn == "N")
             {
