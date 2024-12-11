@@ -470,12 +470,12 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "N")
             {
-                //TODO: check if the chosen field is occupied by an ally or by an enemy for the knight
                 //generate table possibleMoves with every legal move
                 for (int row = moveInIntArray[1] - 4; row <= moveInIntArray[1] + 4; row++) //check the rows
                 {
-                    //if the rows are on the chessboard
-                    if (row >= 2 && row <= 16)
+                    //if the rows are on the chessboard and there isn't an allied pawn there
+                    if (row >= 2 && row <= 16 
+                                 && currentPLayersCords[moveInIntArray[2], moveInIntArray[3]] != "x")
                     {
                         //for the moves 2 places to the left
                         if (row == moveInIntArray[1] - 4)
