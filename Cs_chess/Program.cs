@@ -512,29 +512,32 @@ namespace Jakub_Szewczyk_71695_Szachy
             {
                 Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
                 //generate legal moves for every diagonal
-                //generate maxXandMaxY - right and downside of board
                 for (int i = 2; i < 17; i += 2)
                 {
                     Console.WriteLine("1");
-                    if (moveInIntArray[0] <= 16 && moveInIntArray[1] <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                    //generate maxXandMaxY - right and downside of board
+                    if (moveInIntArray[0] + i <= 16 && moveInIntArray[1] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                    //generate maxXandMinY - right and upside of board
+                    if (moveInIntArray[0] + i <= 16 && moveInIntArray[1] - i >= 2) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
                 }
-                //generate maxXandMinY - right and upside of board
-                for (int i = moveInIntArray[1]; i < 17; i += 2)
+                for (int i = 16; i > 2; i -= 2)
                 {
                     Console.WriteLine("2");
-                    possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                    //generate mixXandMaxY - left and downside of board
+                    if (moveInIntArray[0] - i >= 2 && moveInIntArray[1] + i <= 16) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
+                    //generate mixXandMinY - left and upside of board
+                    if (moveInIntArray[0] - i >= 2 && moveInIntArray[1] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
                 }
-                //generate mixXandMaxY - left and downside of board
-                for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                //for diagnostic purposes, print out the possible moves table
+                for (int row = 0; row < 19; row++)
                 {
-                    Console.WriteLine("3");
-                    possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
-                }
-                //generate mixXandMinY - left and upside of board
-                for (int i = moveInIntArray[1]; i > 2; i -= 2)
-                {
-                    Console.WriteLine("4");
-                    possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
+                    for (int col = 0; col < 19; col++)
+                    {
+                        if (possibleMoves[row, col] == "x") Console.Write(possibleMoves[row, col]);
+                        else Console.Write("0");
+                    }
+
+                    Console.WriteLine();
                 }
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
