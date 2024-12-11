@@ -536,7 +536,65 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "Q")
             {
-                return true;
+                //TODO: check if the chosen field is occupied by an ally or by an enemy for the queen
+                //generate all possible moves in the x and y axis
+                for (int row = 2; row < 17; row += 2) //create rows
+                {
+                    for (int col = 2; col < 17; col += 2) //create columns
+                    {
+                        //fill in all empty slots as 0
+                        possibleMoves[row, col] = "0";
+                        
+                        //fill in the column in which the piece is sitting
+                        if (moveInIntArray[1] == col)
+                        {
+                            possibleMoves[row, col] = "x";
+                        }
+                        // fill in the row in which the piece currently is
+                        if (moveInIntArray[0] == row)
+                        {
+                            possibleMoves[row, col] = "x";
+                        }
+
+                        // mark the enemy as E
+                        if (opponentCords[row, col] == "x")
+                        {
+                            possibleMoves[row, col] = "E";
+                        }
+                        // mark the ally as A
+                        if (currentPLayersCords[row, col] == "x")
+                        {
+                            possibleMoves[row, col] = "A";
+                        }
+                        // mark the piece as an inaccessible field - 0
+                        if (moveInIntArray[0] == row && moveInIntArray[1] == col)
+                        {
+                            possibleMoves[row, col] = "0";
+                        }
+                    }
+                }
+                //generate legal moves for every diagonal
+                //diagonal right up and down
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxXandMaxY - right and downside of board
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                    //generate maxXandMinY - right and upside of board
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
+                }
+                //diagonal left up and down
+                for (int i = 16; i >= 2; i -= 2)
+                {
+                    //mixXandMaxY - left and downside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                    //mixXandMinY - left and upside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
+                }
+                //if the move is in the table with possible moves, then move
+                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
+                return false;
             }
             return false;
         }
