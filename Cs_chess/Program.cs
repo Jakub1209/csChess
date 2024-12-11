@@ -470,6 +470,7 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "N")
             {
+                //TODO: check if the chosen field is occupied by an ally or by an enemy for the knight
                 //generate table possibleMoves with every legal move
                 for (int row = moveInIntArray[1] - 4; row <= moveInIntArray[1] + 4; row++) //check the rows
                 {
@@ -510,34 +511,22 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "B")
             {
+                //TODO: check if the chosen field is occupied by an ally or by an enemy for the bishop
                 Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
                 //generate legal moves for every diagonal
-                for (int i = 2; i < 17; i += 2)
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    Console.WriteLine("1");
                     //generate maxXandMaxY - right and downside of board
-                    if (moveInIntArray[0] + i <= 16 && moveInIntArray[1] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
                     //generate maxXandMinY - right and upside of board
-                    if (moveInIntArray[0] + i <= 16 && moveInIntArray[1] - i >= 2) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
                 }
-                for (int i = 16; i > 2; i -= 2)
+                for (int i = 16; i >= 2; i -= 2)
                 {
-                    Console.WriteLine("2");
-                    //generate mixXandMaxY - left and downside of board
-                    if (moveInIntArray[0] - i >= 2 && moveInIntArray[1] + i <= 16) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
-                    //generate mixXandMinY - left and upside of board
-                    if (moveInIntArray[0] - i >= 2 && moveInIntArray[1] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
-                }
-                //for diagnostic purposes, print out the possible moves table
-                for (int row = 0; row < 19; row++)
-                {
-                    for (int col = 0; col < 19; col++)
-                    {
-                        if (possibleMoves[row, col] == "x") Console.Write(possibleMoves[row, col]);
-                        else Console.Write("0");
-                    }
-
-                    Console.WriteLine();
+                    //mixXandMaxY - left and downside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                    //mixXandMinY - left and upside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
                 }
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
