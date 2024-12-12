@@ -511,7 +511,6 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "B")
             {
-                //TODO: check if the chosen field is occupied by an ally or by an enemy for the bishop
                 Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
                 //generate legal moves for every diagonal
                 //i had to double the for loop to check for enemies or allies
@@ -531,7 +530,6 @@ namespace Jakub_Szewczyk_71695_Szachy
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
                         {
-                            Console.WriteLine("found and enemy maxXandMaxY");
                             break;
                         }
                     }
@@ -558,9 +556,9 @@ namespace Jakub_Szewczyk_71695_Szachy
                     }
                 }
                 //look for minXandMaxY
-                for (int i = 16; i >= 2; i -= 2)
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    //mixXandMaxY - left and downside of board
+                    //minXandMaxY - left and downside of board
                     if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16)
                     {
                         //if the next position is occupied by an ally it means that the current position is the last one possible
@@ -573,13 +571,12 @@ namespace Jakub_Szewczyk_71695_Szachy
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
                         {
-                            Console.WriteLine("found and enemy minXandMaxY");
                             break;
                         }
                     }
                 }
                 //look for minXandMinY
-                for (int i = 16; i >= 2; i -= 2)
+                for (int i = 2; i <= 16; i += 2)
                 {
                     //mixXandMinY - left and upside of board
                     if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2)
@@ -588,18 +585,14 @@ namespace Jakub_Szewczyk_71695_Szachy
                         if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
                         {
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            Console.WriteLine("found and ally minXandMinY");
                             break;
                         }
                         possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
                         {
-                            Console.WriteLine("found and enemy minXandMinY");
                             break;
                         }
-
-                        Console.WriteLine("I checked minXandMinY");
                     }
                 }
                 //for diagnostic purposes - print the possible moves table
