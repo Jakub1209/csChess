@@ -347,126 +347,191 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "R")
             {
-                //generate table possibleMoves with every legal move
-                for (int row = 2; row < 17; row += 2) //create rows
+                //look for maxX
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    for (int col = 2; col < 17; col += 2) //create columns
+                    //generate maxX - right side of the board
+                    if (moveInIntArray[1] + i <= 16)
                     {
-                        //fill in all empty slots as 0
-                        possibleMoves[row, col] = "0";
-                        
-                        //fill in the column in which the piece is sitting
-                        if (moveInIntArray[1] == col)
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0], moveInIntArray[1] + i] == "x")
                         {
-                            possibleMoves[row, col] = "x";
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
                         }
-                        // fill in the row in which the piece currently is
-                         if (moveInIntArray[0] == row)
+                        possibleMoves[moveInIntArray[0], moveInIntArray[1] + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0], moveInIntArray[1] + i] == "x")
                         {
-                            possibleMoves[row, col] = "x";
-                        }
-
-                        // mark the enemy as E
-                        if (opponentCords[row, col] == "x")
-                        {
-                            possibleMoves[row, col] = "E";
-                        }
-                        // mark the ally as A
-                        if (currentPLayersCords[row, col] == "x")
-                        {
-                            possibleMoves[row, col] = "A";
-                        }
-                        // mark the piece as an inaccessible field - 0
-                        if (moveInIntArray[0] == row && moveInIntArray[1] == col)
-                        {
-                            possibleMoves[row, col] = "0";
+                            break;
                         }
                     }
                 }
-                //look for the max position in every direction
-                //generate minX
-                for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                //look for minX
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    if (possibleMoves[moveInIntArray[0], i] == "E")
+                    //generate maxXandMinY - right and upside of board
+                    if (moveInIntArray[1] - i >= 2)
                     {
-                        //if the piece sees an enemy, the last field to attack can only be the enemy
-                        maxPositions[0] = i;
-                        break;
-                    }
-                    if (possibleMoves[moveInIntArray[0], i] == "A")
-                    {
-                        //if the piece sees an ally, the last legal field is one to the right
-                        maxPositions[0] = i + 2;
-                        break;
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
+                        {
+                            Console.WriteLine("found and enemy maxXandMinY");
+                            break;
+                        }
                     }
                 }
-                //if there are no enemies or allies, max boundary on the left side is 2
-                if (maxPositions[0] == 0) maxPositions[0] = 2;
-                //generate maxX
-                for (int i = moveInIntArray[1]; i < 17; i += 2)
+                //look for minXandMaxY
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    if (possibleMoves[moveInIntArray[0], i] == "E")
+                    //minXandMaxY - left and downside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16)
                     {
-                        //if the piece sees an enemy, the last field to attack can only be the enemy
-                        maxPositions[1] = i;
-                        break;
-                    }
-                    if (possibleMoves[moveInIntArray[0], i] == "A")
-                    {
-                        //if the piece sees an ally, the last legal field is one to the right
-                        maxPositions[1] = i - 2;
-                        break;
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
+                        {
+                            break;
+                        }
                     }
                 }
-                //if there are no enemies or allies, max boundary on the right side is 16
-                if (maxPositions[1] == 0) maxPositions[1] = 16;
-                //generate minY
-                for (int i = moveInIntArray[0]; i > 2; i -= 2)
+                //look for minXandMinY
+                for (int i = 2; i <= 16; i += 2)
                 {
-                    if (possibleMoves[i, moveInIntArray[1]] == "E")
+                    //mixXandMinY - left and upside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2)
                     {
-                        //if the piece sees an enemy, the last field to attack can only be the enemy
-                        maxPositions[2] = i;
-                        break;
-                    }
-                    if (possibleMoves[i, moveInIntArray[1]] == "A")
-                    {
-                        //if the piece sees an ally, the last legal field is one to the right
-                        maxPositions[2] = i + 2;
-                        break;
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
+                        {
+                            break;
+                        }
                     }
                 }
-                //if there are no enemies or allies, max boundary on the upside is 2
-                if (maxPositions[2] == 0) maxPositions[2] = 2;
-                //generate maxY
-                for (int i = moveInIntArray[0]; i < 17; i += 2)
-                {
-                    if (possibleMoves[i, moveInIntArray[1]] == "E")
-                    {
-                        //if the piece sees an enemy, the last field to attack can only be the enemy
-                        maxPositions[3] = i;
-                        break;
-                    }
-                    if (possibleMoves[i, moveInIntArray[1]] == "A")
-                    {
-                        //if the piece sees an ally, the last legal field is one to the right
-                        maxPositions[3] = i - 2;
-                        break;
-                    }
-                }
-                //if there are no enemies or allies, max boundary on the downside is 16
-                if (maxPositions[3] == 0) maxPositions[3] = 16;
-                //if the move is in the bounds of the max coordinates, it means you can move the piece
-                if (moveInIntArray[2] >= maxPositions[2] //if the row number is greater than or equal minY
-                    && moveInIntArray[2] <= maxPositions[3] //and it's smaller or equal to maxY
-                    && moveInIntArray[3] >= maxPositions[0] //and the column number is greater than or equal minX
-                    && moveInIntArray[3] <= maxPositions[1]) //and it's smaller or equal to maxX
-                    return true;
-                else
-                {
-                    Console.WriteLine("This move is out of bounds! You cannot move your rook there!");
-                    return false;
-                }
+                //if the move is in the table with possible moves, then move
+                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
+                return false;
+                // //generate table possibleMoves with every legal move
+                // for (int row = 2; row < 17; row += 2) //create rows
+                // {
+                //     for (int col = 2; col < 17; col += 2) //create columns
+                //     {
+                //         //fill in the column in which the piece is sitting
+                //         if (moveInIntArray[1] == col) possibleMoves[row, col] = "x";
+                //         // fill in the row in which the piece currently is
+                //         if (moveInIntArray[0] == row) possibleMoves[row, col] = "x";
+                //         // mark the enemy as E
+                //         if (opponentCords[row, col] == "x") possibleMoves[row, col] = "E";
+                //         // mark the ally as A
+                //         if (currentPLayersCords[row, col] == "x") possibleMoves[row, col] = "A";
+                //     }
+                // }
+                // //look for the max position in every direction
+                // //generate minX
+                // for (int i = moveInIntArray[1]; i > 2; i -= 2)
+                // {
+                //     if (possibleMoves[moveInIntArray[0], i] == "E")
+                //     {
+                //         //if the piece sees an enemy, the last field to attack can only be the enemy
+                //         maxPositions[0] = i;
+                //         break;
+                //     }
+                //     if (possibleMoves[moveInIntArray[0], i] == "A")
+                //     {
+                //         //if the piece sees an ally, the last legal field is one to the right
+                //         maxPositions[0] = i + 2;
+                //         break;
+                //     }
+                // }
+                // //if there are no enemies or allies, max boundary on the left side is 2
+                // if (maxPositions[0] == 0) maxPositions[0] = 2;
+                // //generate maxX
+                // for (int i = moveInIntArray[1]; i < 17; i += 2)
+                // {
+                //     if (possibleMoves[moveInIntArray[0], i] == "E")
+                //     {
+                //         //if the piece sees an enemy, the last field to attack can only be the enemy
+                //         maxPositions[1] = i;
+                //         break;
+                //     }
+                //     if (possibleMoves[moveInIntArray[0], i] == "A")
+                //     {
+                //         //if the piece sees an ally, the last legal field is one to the right
+                //         maxPositions[1] = i - 2;
+                //         break;
+                //     }
+                // }
+                // //if there are no enemies or allies, max boundary on the right side is 16
+                // if (maxPositions[1] == 0) maxPositions[1] = 16;
+                // //generate minY
+                // for (int i = moveInIntArray[0]; i > 2; i -= 2)
+                // {
+                //     if (possibleMoves[i, moveInIntArray[1]] == "E")
+                //     {
+                //         //if the piece sees an enemy, the last field to attack can only be the enemy
+                //         maxPositions[2] = i;
+                //         break;
+                //     }
+                //     if (possibleMoves[i, moveInIntArray[1]] == "A")
+                //     {
+                //         //if the piece sees an ally, the last legal field is one to the right
+                //         maxPositions[2] = i + 2;
+                //         break;
+                //     }
+                // }
+                // //if there are no enemies or allies, max boundary on the upside is 2
+                // if (maxPositions[2] == 0) maxPositions[2] = 2;
+                // //generate maxY
+                // for (int i = moveInIntArray[0]; i < 17; i += 2)
+                // {
+                //     if (possibleMoves[i, moveInIntArray[1]] == "E")
+                //     {
+                //         //if the piece sees an enemy, the last field to attack can only be the enemy
+                //         maxPositions[3] = i;
+                //         break;
+                //     }
+                //     if (possibleMoves[i, moveInIntArray[1]] == "A")
+                //     {
+                //         //if the piece sees an ally, the last legal field is one to the right
+                //         maxPositions[3] = i - 2;
+                //         break;
+                //     }
+                // }
+                // //if there are no enemies or allies, max boundary on the downside is 16
+                // if (maxPositions[3] == 0) maxPositions[3] = 16;
+                // //if the move is in the bounds of the max coordinates, it means you can move the piece
+                // if (moveInIntArray[2] >= maxPositions[2] //if the row number is greater than or equal minY
+                //     && moveInIntArray[2] <= maxPositions[3] //and it's smaller or equal to maxY
+                //     && moveInIntArray[3] >= maxPositions[0] //and the column number is greater than or equal minX
+                //     && moveInIntArray[3] <= maxPositions[1]) //and it's smaller or equal to maxX
+                //     return true;
+                // else
+                // {
+                //     Console.WriteLine("This move is out of bounds! You cannot move your rook there!");
+                //     return false;
+                // }
             }
             else if (pawn == "N")
             {
@@ -513,8 +578,100 @@ namespace Jakub_Szewczyk_71695_Szachy
             {
                 Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
                 //generate legal moves for every diagonal
-                //i had to double the for loop to check for enemies or allies
-                //in this for loop look for maxXandMaxY
+                //I had to double the for loop to check for enemies or allies
+                //look for maxXandMaxY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxXandMaxY - right and downside of board
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+                //look for maxXandMinY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxXandMinY - right and upside of board
+                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
+                        {
+                            Console.WriteLine("found and enemy maxXandMinY");
+                            break;
+                        }
+                    }
+                }
+                //look for minXandMaxY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //minXandMaxY - left and downside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+                //look for minXandMinY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //mixXandMinY - left and upside of board
+                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
+                        {
+                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
+                            break;
+                        }
+                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+                //if the move is in the table with possible moves, then move
+                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
+                return false;
+            }
+            else if (pawn == "Q")
+            {
+                //TODO: check if the chosen field is occupied by an ally or by an enemy for the queen
+                //generate all possible moves in the x and y axis
+                //generate legal moves for every diagonal
+                //look for maxXandMaxY
                 for (int i = 2; i <= 16; i += 2)
                 {
                     //generate maxXandMaxY - right and downside of board
@@ -605,69 +762,6 @@ namespace Jakub_Szewczyk_71695_Szachy
                     }
                     Console.WriteLine();
                 }
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
-                return false;
-            }
-            else if (pawn == "Q")
-            {
-                //TODO: check if the chosen field is occupied by an ally or by an enemy for the queen
-                //generate all possible moves in the x and y axis
-                for (int row = 2; row < 17; row += 2) //create rows
-                {
-                    for (int col = 2; col < 17; col += 2) //create columns
-                    {
-                        //fill in all empty slots as 0
-                        possibleMoves[row, col] = "0";
-                        
-                        //fill in the column in which the piece is sitting
-                        if (moveInIntArray[1] == col)
-                        {
-                            possibleMoves[row, col] = "x";
-                        }
-                        // fill in the row in which the piece currently is
-                        if (moveInIntArray[0] == row)
-                        {
-                            possibleMoves[row, col] = "x";
-                        }
-
-                        // mark the enemy as E
-                        if (opponentCords[row, col] == "x")
-                        {
-                            possibleMoves[row, col] = "E";
-                        }
-                        // mark the ally as A
-                        if (currentPLayersCords[row, col] == "x")
-                        {
-                            possibleMoves[row, col] = "A";
-                        }
-                        // mark the piece as an inaccessible field - 0
-                        if (moveInIntArray[0] == row && moveInIntArray[1] == col)
-                        {
-                            possibleMoves[row, col] = "0";
-                        }
-                    }
-                }
-                //generate legal moves for every diagonal
-                //diagonal right up and down
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxXandMaxY - right and downside of board
-                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
-                    //generate maxXandMinY - right and upside of board
-                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
-                }
-                //diagonal left up and down
-                for (int i = 16; i >= 2; i -= 2)
-                {
-                    //mixXandMaxY - left and downside of board
-                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16) possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
-                    //mixXandMinY - left and upside of board
-                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2) possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
-                }
-                //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
                 Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
