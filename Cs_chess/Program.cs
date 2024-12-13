@@ -675,97 +675,12 @@ namespace Jakub_Szewczyk_71695_Szachy
             if (pawn == "Q")
             {
                 //generate all possible moves in horizontal and vertical lines
-                possibleMoves = GenerateHorizontalAndVerticalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
+                string[,] possibleMoves1 = 
+                    GenerateHorizontalAndVerticalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
+                string[,] possibleMoves2 =
+                    GenerateDiagonalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
+                
 
-                //generate legal moves for every diagonal
-                //look for maxX and maxY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxXandMaxY - right and downside of board
-                    if (startingPosX + i <= 16 && startingPosY + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPlayersCords[startingPosY + i, startingPosX + i] == "x")
-                        {
-                            possibleMoves[startingPosY, startingPosX] = "x";
-                            break;
-                        }
-
-                        possibleMoves[startingPosY + i, startingPosX + i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[startingPosY + i, startingPosX + i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                //look for maxX and minY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxXandMinY - right and upside of board
-                    if (startingPosX + i <= 16 && startingPosY - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPlayersCords[startingPosY - i, startingPosX + i] == "x")
-                        {
-                            possibleMoves[startingPosY, startingPosX] = "x";
-                            break;
-                        }
-
-                        possibleMoves[startingPosY - i, startingPosX + i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[startingPosY - i, startingPosX + i] == "x")
-                        {
-                            Console.WriteLine("found and enemy maxXandMinY");
-                            break;
-                        }
-                    }
-                }
-
-                //look for minX and maxY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //minXandMaxY - left and downside of board
-                    if (startingPosX - i >= 2 && startingPosY + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPlayersCords[startingPosY + i, startingPosX - i] == "x")
-                        {
-                            possibleMoves[startingPosY, startingPosX] = "x";
-                            break;
-                        }
-
-                        possibleMoves[startingPosY + i, startingPosX - i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[startingPosY + i, startingPosX - i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                //look for minX and minY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //mixXandMinY - left and upside of board
-                    if (startingPosX - i >= 2 && startingPosY - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPlayersCords[startingPosY - i, startingPosX - i] == "x")
-                        {
-                            possibleMoves[startingPosY, startingPosX] = "x";
-                            break;
-                        }
-
-                        possibleMoves[startingPosY - i, startingPosX - i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[startingPosY - i, startingPosX - i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
             }
 
             return possibleMoves;
@@ -868,6 +783,106 @@ namespace Jakub_Szewczyk_71695_Szachy
                     }
                 }
                 
+            return possibleMoves;
+        }
+
+        static string[,] GenerateDiagonalMoves(
+            int startingPosX,
+            int startingPosY,
+            string[,] currentPlayersCords,
+            string[,] opponentCords
+        )
+        {
+            string[,] possibleMoves = new string[19, 19];
+            
+            //look for maxX and maxY
+            for (int i = 2; i <= 16; i += 2)
+            {
+                //generate maxXandMaxY - right and downside of board
+                if (startingPosX + i <= 16 && startingPosY + i <= 16)
+                {
+                    //if the next position is occupied by an ally it means that the current position is the last one possible
+                    if (currentPlayersCords[startingPosY + i, startingPosX + i] == "x")
+                    {
+                        possibleMoves[startingPosY, startingPosX] = "x";
+                        break;
+                    }
+
+                    possibleMoves[startingPosY + i, startingPosX + i] = "x";
+                    //if the next position is occupied by an enemy it means that it is the last possible position
+                    if (opponentCords[startingPosY + i, startingPosX + i] == "x")
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //look for maxX and minY
+            for (int i = 2; i <= 16; i += 2)
+            {
+                //generate maxXandMinY - right and upside of board
+                if (startingPosX + i <= 16 && startingPosY - i >= 2)
+                {
+                    //if the next position is occupied by an ally it means that the current position is the last one possible
+                    if (currentPlayersCords[startingPosY - i, startingPosX + i] == "x")
+                    {
+                        possibleMoves[startingPosY, startingPosX] = "x";
+                        break;
+                    }
+
+                    possibleMoves[startingPosY - i, startingPosX + i] = "x";
+                    //if the next position is occupied by an enemy it means that it is the last possible position
+                    if (opponentCords[startingPosY - i, startingPosX + i] == "x")
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //look for minX and maxY
+            for (int i = 2; i <= 16; i += 2)
+            {
+                //minXandMaxY - left and downside of board
+                if (startingPosX - i >= 2 && startingPosY + i <= 16)
+                {
+                    //if the next position is occupied by an ally it means that the current position is the last one possible
+                    if (currentPlayersCords[startingPosY + i, startingPosX - i] == "x")
+                    {
+                        possibleMoves[startingPosY, startingPosX] = "x";
+                        break;
+                    }
+
+                    possibleMoves[startingPosY + i, startingPosX - i] = "x";
+                    //if the next position is occupied by an enemy it means that it is the last possible position
+                    if (opponentCords[startingPosY + i, startingPosX - i] == "x")
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //look for minX and minY
+            for (int i = 2; i <= 16; i += 2)
+            {
+                //mixXandMinY - left and upside of board
+                if (startingPosX - i >= 2 && startingPosY - i >= 2)
+                {
+                    //if the next position is occupied by an ally it means that the current position is the last one possible
+                    if (currentPlayersCords[startingPosY - i, startingPosX - i] == "x")
+                    {
+                        possibleMoves[startingPosY, startingPosX] = "x";
+                        break;
+                    }
+
+                    possibleMoves[startingPosY - i, startingPosX - i] = "x";
+                    //if the next position is occupied by an enemy it means that it is the last possible position
+                    if (opponentCords[startingPosY - i, startingPosX - i] == "x")
+                    {
+                        break;
+                    }
+                }
+            }
+
             return possibleMoves;
         }
     }
