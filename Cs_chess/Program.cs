@@ -577,7 +577,6 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "Q")
             {
-                //TODO: check if the chosen field is occupied by an ally or by an enemy for the queen
                 //generate all possible moves in horizontal and vertical lines
                 //look for maxX
                 for (int i = 2; i <= 16; i += 2)
@@ -755,6 +754,28 @@ namespace Jakub_Szewczyk_71695_Szachy
                 //else:
                 Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
                 return false;
+            }
+            else if (pawn == "K")
+            {
+                if (moveInIntArray[1] + 2 <= 16)
+                {
+                    //make move right possible
+                    possibleMoves[moveInIntArray[0], moveInIntArray[1] + 2] = "x";
+                }
+                //make move left possible
+                possibleMoves[moveInIntArray[0], moveInIntArray[1] - 2] = "x";
+                //make move up possible
+                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1]] = "x";
+                //make move down possible
+                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1]] = "x";
+                //make move left and up possible
+                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] - 2] = "x";
+                //make move right and up possible
+                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] + 2] = "x";
+                //make move left and down possible
+                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] - 2] = "x";
+                //make move right and down possible
+                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] + 2] = "x";
             }
             return false;
         }
