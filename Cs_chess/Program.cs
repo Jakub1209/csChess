@@ -8,6 +8,8 @@ namespace Jakub_Szewczyk_71695_Szachy
         static string[,] _player2Coordinates = new string[19, 19];
         static string[,] _chessBoard = CreateChessBoard();
         static int _turnNumber = 0;
+        static bool _king1InCheck = false;
+        static bool _king2InCheck = false;
 
         public static void Main(string[] args)
         {
@@ -26,9 +28,18 @@ namespace Jakub_Szewczyk_71695_Szachy
                     else if (row % 2 == 0 && col % 2 == 1) //add the vertical lines color
                         Console.ForegroundColor = ConsoleColor.Green;
                     if (_player1Coordinates[row, col] == "x") //color in player1's pawns in red
+                    {
                         Console.ForegroundColor = ConsoleColor.Red;
+                        if (_chessBoard[row, col] == "K" && _king1InCheck)
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
                     else if (_player2Coordinates[row, col] == "x") //color in player2's pawns in blue
+                    {
                         Console.ForegroundColor = ConsoleColor.Blue;
+                        if (_chessBoard[row, col] == "K" && _king2InCheck)
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    
 
                     Console.Write(chessBoard[row, col]); //print out the chessboard cell by cell, starting from UPPER LEFT!!!
                     Console.ResetColor(); //reset the color so that the numbers and letters print out in white
@@ -310,6 +321,20 @@ namespace Jakub_Szewczyk_71695_Szachy
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
             int[] opponentKingPosition = new int[2];
+            
+            //get the cords of the opponents King
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    if (_chessBoard[row, col] == "K" && opponentCords[row, col] == "x")
+                    {
+                        opponentKingPosition[0] = row;
+                        opponentKingPosition[1] = col;
+                        break;
+                    }
+                }
+            }
             
             if (pawn == "P")
             {
@@ -596,7 +621,14 @@ namespace Jakub_Szewczyk_71695_Szachy
                 return false;
             }
             else if (pawn == "Q")
-            { 
+            {
+                //check for a check
+                if (attacksAfterMove[opponentKingPosition[0], opponentKingPosition[1]] == "x")
+                {
+                    if (_turnNumber % 2 == 0) _king2InCheck = true;
+                    else _king1InCheck = false;
+                }
+                
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
                 Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
@@ -644,25 +676,6 @@ namespace Jakub_Szewczyk_71695_Szachy
                 //else:
                 Console.WriteLine("This move is out of bounds for your King! You cannot move there!");
             }
-
-            //get the cords of the opponents King
-            for (int row = 2; row <= 16; row += 2)
-            {
-                for (int col = 2; col <= 16; col += 2)
-                {
-                    if (_chessBoard[row, col] == "K" && opponentCords[row, col] == "x")
-                    {
-                        opponentKingPosition[0] = row;
-                        opponentKingPosition[1] = col;
-                        break;
-                    }
-                }
-            }
-            //check for a check
-            if (attacksAfterMove[opponentKingPosition[0], opponentKingPosition[1]] == "x")
-            {
-                //TODO: mark the King in check
-            }
             return false;
         }
 
@@ -674,13 +687,22 @@ namespace Jakub_Szewczyk_71695_Szachy
             
             if (pawn == "Q")
             {
+                
                 //generate all possible moves in horizontal and vertical lines
                 string[,] possibleMoves1 = 
                     GenerateHorizontalAndVerticalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
+                //generate all possible moves in diagonal lines
                 string[,] possibleMoves2 =
                     GenerateDiagonalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
-                
-
+                //join possibleMoves1 and possibleMoves2 into possibleMoves
+                for (int row = 2; row <= 16; row += 2)
+                {
+                    for (int col = 2; col <= 16; col += 2)
+                    {
+                        if (possibleMoves1[row, col] == "x" || possibleMoves2[row, col] == "x")
+                            possibleMoves[row, col] = "x";
+                    }
+                }
             }
 
             return possibleMoves;
