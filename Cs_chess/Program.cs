@@ -757,25 +757,50 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "K")
             {
+                //check if the new x coordinate is in bounds of the board - right side
                 if (moveInIntArray[1] + 2 <= 16)
                 {
                     //make move right possible
                     possibleMoves[moveInIntArray[0], moveInIntArray[1] + 2] = "x";
+                    //make move right and up possible
+                    if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] + 2] = "x";
+                    //make move right and down possible
+                    if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] + 2] = "x";
                 }
-                //make move left possible
-                possibleMoves[moveInIntArray[0], moveInIntArray[1] - 2] = "x";
+                //check if the new x coordinate is in bounds of the board - left side
+                if (moveInIntArray[1] - 2 >= 2)
+                {
+                    //make move left possible
+                    possibleMoves[moveInIntArray[0], moveInIntArray[1] - 2] = "x";
+                    //make move left and up possible
+                    if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] - 2] = "x";
+                    //make move left and down possible
+                    if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] - 2] = "x";
+                }
                 //make move up possible
-                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1]] = "x";
+                if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1]] = "x";
                 //make move down possible
-                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1]] = "x";
-                //make move left and up possible
-                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] - 2] = "x";
-                //make move right and up possible
-                possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] + 2] = "x";
-                //make move left and down possible
-                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] - 2] = "x";
-                //make move right and down possible
-                possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] + 2] = "x";
+                if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1]] = "x";
+                //check if there are allies in the legal fields - if yes, remove that field from the possibleMoves table
+                for (int row = 2; row <= 16; row += 2)
+                {
+                    for (int col = 2; col <= 16; col += 2)
+                    {
+                        if (possibleMoves[row, col] == "x" && currentPLayersCords[row, col] == "x")
+                            possibleMoves[row, col] = "";
+                    }
+                }
+                //for diagnostic purposes - print the possible moves table
+                for (int row = 2; row <= 16; row += 2)
+                {
+                    for (int col = 2; col <= 16; col += 2)
+                    {
+                        if (possibleMoves[row, col] == "x") Console.Write("x");
+                        else Console.Write("0");
+                    }
+                    Console.WriteLine();
+                }
+                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
             }
             return false;
         }
