@@ -7,6 +7,7 @@ namespace Jakub_Szewczyk_71695_Szachy
         static string[,] _player1Coordinates = new string[19, 19]; // setting up global variables
         static string[,] _player2Coordinates = new string[19, 19];
         static string[,] _chessBoard = CreateChessBoard();
+        static int _turnNumber = 0;
 
         public static void Main(string[] args)
         {
@@ -156,23 +157,22 @@ namespace Jakub_Szewczyk_71695_Szachy
         static void GameRunning()
         {
             bool gameRunning = true;
-            int turnNumber = 0;
 
             while (gameRunning)
             {
-                int playerNumber = turnNumber % 2 + 1;
+                int playerNumber = _turnNumber % 2 + 1;
 
                 
                 // Console.Clear();
                 Console.WriteLine($"It is player{playerNumber}'s turn! \n");
                 PrintChessBoard(_chessBoard);
-                MakeAmove(playerNumber, turnNumber);
+                MakeAmove(playerNumber);
                 
-                turnNumber++;
+                _turnNumber++;
             }
         }
         
-        static void MakeAmove(int playerNumber, int turnNumber)
+        static void MakeAmove(int playerNumber)
         {
             while (true)
             {
@@ -184,7 +184,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 // if the pawn has a legal move, only then you can move it.
                 
                 if (PawnBelongsToPlayer(currentPlayersCoordinates, moveInIntArray) && 
-                    PawnMoveIsLegal(moveInIntArray, chosenPawn, _player1Coordinates, _player2Coordinates, turnNumber))
+                    PawnMoveIsLegal(moveInIntArray, chosenPawn))
                 {
                     currentPlayersCoordinates[moveInIntArray[0], moveInIntArray[1]] = " ";
                     currentPlayersCoordinates[moveInIntArray[2], moveInIntArray[3]] = "x";
@@ -301,40 +301,37 @@ namespace Jakub_Szewczyk_71695_Szachy
             return playerCords[moveInIntArray[0], moveInIntArray[1]] == "x";
         }
 
-        static bool PawnMoveIsLegal(
-            int[] moveInIntArray,
-            string pawn,
-            string[,] player1Cords,
-            string[,] player2Cords,
-            int turnNumber
-        )
+        static bool PawnMoveIsLegal(int[] moveInIntArray, string pawn)
         {
             int rowDifference = Math.Abs(moveInIntArray[0] - moveInIntArray[2]);
             int columnDifference = Math.Abs(moveInIntArray[1] - moveInIntArray[3]);
-            string[,] opponentCords = turnNumber % 2 == 0 ? player2Cords : player1Cords;
-            string[,] currentPLayersCords = turnNumber % 2 == 0 ? player1Cords : player2Cords;
-            string[,] possibleMoves = new string[19, 19];
-            int[] maxPositions = new int[4];
+            string[,] opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
+            string[,] currentPLayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
+            string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
+            string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
+            int[] opponentKingPosition = new int[2];
+            
             if (pawn == "P")
             {
                 //checking if the pawn doesn't move backwards - for player1 the difference should be negative
-                if ((turnNumber % 2 == 0 && moveInIntArray[2] - moveInIntArray[0] < 0)
-                    || (turnNumber % 2 == 1 && moveInIntArray[2] - moveInIntArray[0] > 0))
+                if ((_turnNumber % 2 == 0 && moveInIntArray[2] - moveInIntArray[0] < 0)
+                    || (_turnNumber % 2 == 1 && moveInIntArray[2] - moveInIntArray[0] > 0))
                 {
                     if (
                         rowDifference <= 4 //if the pawn wants tp move two tiles
-                        && (moveInIntArray[0] == 14 || moveInIntArray[0] == 4) //and it's on the correct starting position
+                        && (moveInIntArray[0] == 14 ||
+                            moveInIntArray[0] == 4) //and it's on the correct starting position
                         && columnDifference == 0 //and it doesn't want to move sideways
                     )
                         return true;
                     if (
-                        rowDifference == 2 
+                        rowDifference == 2
                         && (
                             (columnDifference == 0
-                             && player1Cords[moveInIntArray[2], moveInIntArray[3]] != "x" 
-                             && player2Cords[moveInIntArray[2], moveInIntArray[3]] != "x") 
-                            || 
-                            (columnDifference == 2 
+                             && _player1Coordinates[moveInIntArray[2], moveInIntArray[3]] != "x"
+                             && _player2Coordinates[moveInIntArray[2], moveInIntArray[3]] != "x")
+                            ||
+                            (columnDifference == 2
                              && opponentCords[moveInIntArray[2], moveInIntArray[3]] == "x"))
                     )
                         return true;
@@ -359,6 +356,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0], moveInIntArray[1] + i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0], moveInIntArray[1] + i] == "x")
@@ -367,6 +365,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for minX
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -379,6 +378,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0], moveInIntArray[1] - i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0], moveInIntArray[1] - i] == "x")
@@ -387,6 +387,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for maxY
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -399,6 +400,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] + i, moveInIntArray[1]] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1]] == "x")
@@ -407,6 +409,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for minY
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -419,6 +422,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] - i, moveInIntArray[1]] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1]] == "x")
@@ -427,6 +431,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //for diagnostic purposes - print the possible moves table
                 for (int row = 2; row <= 16; row += 2)
                 {
@@ -435,8 +440,10 @@ namespace Jakub_Szewczyk_71695_Szachy
                         if (possibleMoves[row, col] == "x") Console.Write("x");
                         else Console.Write("0");
                     }
+
                     Console.WriteLine();
                 }
+
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
@@ -449,7 +456,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 for (int row = moveInIntArray[1] - 4; row <= moveInIntArray[1] + 4; row++) //check the rows
                 {
                     //if the rows are on the chessboard and there isn't an allied pawn there
-                    if (row >= 2 && row <= 16 
+                    if (row >= 2 && row <= 16
                                  && currentPLayersCords[moveInIntArray[2], moveInIntArray[3]] != "x")
                     {
                         //for the moves 2 places to the left
@@ -458,18 +465,21 @@ namespace Jakub_Szewczyk_71695_Szachy
                             if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 2] = "x";
                             if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 2] = "x";
                         }
+
                         //for the moves 1 place to the left
                         if (row == moveInIntArray[1] - 2)
                         {
                             if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 4] = "x";
                             if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 4] = "x";
                         }
+
                         //for the moves 2 places to the right
                         if (row == moveInIntArray[1] + 4)
                         {
                             if (moveInIntArray[0] <= 14) possibleMoves[row, moveInIntArray[0] + 2] = "x";
                             if (moveInIntArray[0] >= 4) possibleMoves[row, moveInIntArray[0] - 2] = "x";
                         }
+
                         //for the moves 1 place to the right
                         if (row == moveInIntArray[1] + 2)
                         {
@@ -478,6 +488,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[3], moveInIntArray[2]] == "x") return true;
                 //else:
@@ -486,7 +497,8 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
             else if (pawn == "B")
             {
-                Console.WriteLine($"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
+                Console.WriteLine(
+                    $"{moveInIntArray[0]}, {moveInIntArray[1]}, {moveInIntArray[2]}, {moveInIntArray[3]}");
                 //generate legal moves for every diagonal
                 //look for maxXandMaxY
                 for (int i = 2; i <= 16; i += 2)
@@ -500,6 +512,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
@@ -508,6 +521,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for maxXandMinY
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -520,6 +534,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
@@ -529,6 +544,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for minXandMaxY
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -541,6 +557,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
@@ -549,6 +566,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //look for minXandMinY
                 for (int i = 2; i <= 16; i += 2)
                 {
@@ -561,6 +579,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
                             break;
                         }
+
                         possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
                         //if the next position is occupied by an enemy it means that it is the last possible position
                         if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
@@ -569,6 +588,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
@@ -576,180 +596,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 return false;
             }
             else if (pawn == "Q")
-            {
-                //generate all possible moves in horizontal and vertical lines
-                //look for maxX
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxX - right side of the board
-                    if (moveInIntArray[1] + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0], moveInIntArray[1] + i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0], moveInIntArray[1] + i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0], moveInIntArray[1] + i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //look for minX
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate minX - left side of board
-                    if (moveInIntArray[1] - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0], moveInIntArray[1] - i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0], moveInIntArray[1] - i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0], moveInIntArray[1] - i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //look for maxY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //maxY - downside of board
-                    if (moveInIntArray[0] + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1]] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1]] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1]] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //look for minY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //minY - upside of board
-                    if (moveInIntArray[0] - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1]] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1]] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1]] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //generate legal moves for every diagonal
-                //look for maxX and maxY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxXandMaxY - right and downside of board
-                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] + i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] + i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //look for maxX and minY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //generate maxXandMinY - right and upside of board
-                    if (moveInIntArray[1] + i <= 16 && moveInIntArray[0] - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] + i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] + i] == "x")
-                        {
-                            Console.WriteLine("found and enemy maxXandMinY");
-                            break;
-                        }
-                    }
-                }
-                //look for minX and maxY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //minXandMaxY - left and downside of board
-                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] + i <= 16)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] + i, moveInIntArray[1] - i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] + i, moveInIntArray[1] - i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //look for minX and minY
-                for (int i = 2; i <= 16; i += 2)
-                {
-                    //mixXandMinY - left and upside of board
-                    if (moveInIntArray[1] - i >= 2 && moveInIntArray[0] - i >= 2)
-                    {
-                        //if the next position is occupied by an ally it means that the current position is the last one possible
-                        if (currentPLayersCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
-                        {
-                            possibleMoves[moveInIntArray[0], moveInIntArray[1]] = "x";
-                            break;
-                        }
-                        possibleMoves[moveInIntArray[0] - i, moveInIntArray[1] - i] = "x";
-                        //if the next position is occupied by an enemy it means that it is the last possible position
-                        if (opponentCords[moveInIntArray[0] - i, moveInIntArray[1] - i] == "x")
-                        {
-                            break;
-                        }
-                    }
-                }
-                //for diagnostic purposes - print the possible moves table
-                for (int row = 2; row <= 16; row += 2)
-                {
-                    for (int col = 2; col <= 16; col += 2)
-                    {
-                        if (possibleMoves[row, col] == "x") Console.Write("x");
-                        else Console.Write("0");
-                    }
-                    Console.WriteLine();
-                }
+            { 
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
                 Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
@@ -767,6 +614,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                     //make move right and down possible
                     if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] + 2] = "x";
                 }
+
                 //check if the new x coordinate is in bounds of the board - left side
                 if (moveInIntArray[1] - 2 >= 2)
                 {
@@ -777,6 +625,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                     //make move left and down possible
                     if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] - 2] = "x";
                 }
+
                 //make move up possible
                 if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1]] = "x";
                 //make move down possible
@@ -790,20 +639,236 @@ namespace Jakub_Szewczyk_71695_Szachy
                             possibleMoves[row, col] = "";
                     }
                 }
-                //for diagnostic purposes - print the possible moves table
-                for (int row = 2; row <= 16; row += 2)
-                {
-                    for (int col = 2; col <= 16; col += 2)
-                    {
-                        if (possibleMoves[row, col] == "x") Console.Write("x");
-                        else Console.Write("0");
-                    }
-                    Console.WriteLine();
-                }
+
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
+                //else:
+                Console.WriteLine("This move is out of bounds for your King! You cannot move there!");
+            }
+
+            //get the cords of the opponents King
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    if (_chessBoard[row, col] == "K" && opponentCords[row, col] == "x")
+                    {
+                        opponentKingPosition[0] = row;
+                        opponentKingPosition[1] = col;
+                        break;
+                    }
+                }
+            }
+            //check for a check
+            if (attacksAfterMove[opponentKingPosition[0], opponentKingPosition[1]] == "x")
+            {
+                //TODO: mark the King in check
             }
             return false;
         }
-        
+
+        static string[,] GenerateTableWithPossibleMoves(int startingPosX, int startingPosY, string pawn)
+        {
+            string[,] possibleMoves = new string[19, 19];
+            string[,] opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
+            string[,] currentPlayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
+            
+            if (pawn == "Q")
+            {
+                //generate all possible moves in horizontal and vertical lines
+                possibleMoves = GenerateHorizontalAndVerticalMoves(startingPosX, startingPosY, currentPlayersCords, opponentCords);
+
+                //generate legal moves for every diagonal
+                //look for maxX and maxY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxXandMaxY - right and downside of board
+                    if (startingPosX + i <= 16 && startingPosY + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY + i, startingPosX + i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY + i, startingPosX + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY + i, startingPosX + i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                //look for maxX and minY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxXandMinY - right and upside of board
+                    if (startingPosX + i <= 16 && startingPosY - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY - i, startingPosX + i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY - i, startingPosX + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY - i, startingPosX + i] == "x")
+                        {
+                            Console.WriteLine("found and enemy maxXandMinY");
+                            break;
+                        }
+                    }
+                }
+
+                //look for minX and maxY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //minXandMaxY - left and downside of board
+                    if (startingPosX - i >= 2 && startingPosY + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY + i, startingPosX - i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY + i, startingPosX - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY + i, startingPosX - i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                //look for minX and minY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //mixXandMinY - left and upside of board
+                    if (startingPosX - i >= 2 && startingPosY - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY - i, startingPosX - i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY - i, startingPosX - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY - i, startingPosX - i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return possibleMoves;
+        }
+
+        static string[,] GenerateHorizontalAndVerticalMoves(
+            int startingPosX, 
+            int startingPosY, 
+            string[,] currentPlayersCords, 
+            string[,] opponentCords
+            )
+        {
+            string[,] possibleMoves = new string[19, 19];
+            
+            //look for maxX
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate maxX - right side of the board
+                    if (startingPosX + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY, startingPosX + i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY, startingPosX + i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY, startingPosX + i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                //look for minX
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //generate minX - left side of board
+                    if (startingPosX - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY, startingPosX - i] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY, startingPosX - i] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY, startingPosX - i] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                //look for maxY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //maxY - downside of board
+                    if (startingPosY + i <= 16)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY + i, startingPosX] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY + i, startingPosX] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY + i, startingPosX] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                //look for minY
+                for (int i = 2; i <= 16; i += 2)
+                {
+                    //minY - upside of board
+                    if (startingPosY - i >= 2)
+                    {
+                        //if the next position is occupied by an ally it means that the current position is the last one possible
+                        if (currentPlayersCords[startingPosY - i, startingPosX] == "x")
+                        {
+                            possibleMoves[startingPosY, startingPosX] = "x";
+                            break;
+                        }
+
+                        possibleMoves[startingPosY - i, startingPosX] = "x";
+                        //if the next position is occupied by an enemy it means that it is the last possible position
+                        if (opponentCords[startingPosY - i, startingPosX] == "x")
+                        {
+                            break;
+                        }
+                    }
+                }
+                
+            return possibleMoves;
+        }
     }
 }
