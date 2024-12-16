@@ -192,7 +192,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 string chosenPawn = _chessBoard[moveInIntArray[0], moveInIntArray[1]];
                 
                 // if the pawn has a legal move, only then you can move it.
-                if (PawnBelongsToPlayer(_currentPlayersCords, moveInIntArray) && 
+                if (PawnBelongsToPlayer(moveInIntArray) && 
                     PawnMoveIsLegal(moveInIntArray, chosenPawn))
                 {
                     _currentPlayersCords[moveInIntArray[0], moveInIntArray[1]] = " ";
@@ -273,8 +273,6 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static bool MoveIsOnChessboard(string move)
         {
-            int arrayIndex = 0;
-
             if (move.Length > 4)
             {
                 Console.WriteLine($"Incorrect move! '{move}' has too many symbols!\n" +
@@ -284,28 +282,27 @@ namespace Jakub_Szewczyk_71695_Szachy
                 return false;
             }
 
-            foreach (char character in move)
+            for (int i = 0; i < move.Length; i++)
             {
-                int charToInt = character;
+                int charToInt = move[i];
                 
-                if ((arrayIndex % 2 == 0 && (charToInt < 97 || charToInt > 104)) ||
-                    (arrayIndex % 2 == 1 && (charToInt < 49 || charToInt > 56)))
+                if ((i % 2 == 0 && (charToInt < 97 || charToInt > 104)) ||
+                    (i % 2 == 1 && (charToInt < 49 || charToInt > 56)))
                 {
                     Console.Write("Incorrect move! ");
-                    if (arrayIndex % 2 == 0)
-                        Console.WriteLine($"'{character}' should be a letter in range: (a-h).");
-                    else if (arrayIndex % 2 == 1)
-                        Console.WriteLine($"'{character}' should be a digit in range: (1-8).");
+                    if (i % 2 == 0)
+                        Console.WriteLine($"'{move[i]}' should be a letter in range: (a-h).");
+                    else if (i % 2 == 1)
+                        Console.WriteLine($"'{move[i]}' should be a digit in range: (1-8).");
                     return false;
                 }
-                arrayIndex++;
             }
             return true;
         }
 
-        static bool PawnBelongsToPlayer(string[,] playerCords, int[] moveInIntArray)
+        static bool PawnBelongsToPlayer(int[] moveInIntArray)
         {
-            return playerCords[moveInIntArray[0], moveInIntArray[1]] == "x";
+            return _currentPlayersCords[moveInIntArray[0], moveInIntArray[1]] == "x";
         }
 
         static bool PawnMoveIsLegal(int[] moveInIntArray, string pawn)
@@ -313,19 +310,19 @@ namespace Jakub_Szewczyk_71695_Szachy
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
             int[] opponentKingsPosition = GetOpponentKingsCords();
+            
             CheckForACheck(attacksAfterMove, opponentKingsPosition);
             
             //for diagnostic purposes - print the possible moves table
-            for (int row = 2; row <= 16; row += 2)
-            {
-                for (int col = 2; col <= 16; col += 2)
-                {
-                    if (possibleMoves[row, col] == "x") Console.Write("x");
-                    else Console.Write("0");
-                }
-
-                Console.WriteLine();
-            }
+            // for (int row = 2; row <= 16; row += 2)
+            // {
+            //     for (int col = 2; col <= 16; col += 2)
+            //     {
+            //         Console.Write(possibleMoves[row, col] == "x" ? "x" : "0");
+            //     }
+            //
+            //     Console.WriteLine();
+            // }
 
             //if the move is in the table with possible moves, then move
             return possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x";
