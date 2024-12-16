@@ -8,11 +8,11 @@ namespace Jakub_Szewczyk_71695_Szachy
         static string[,] _player1Coordinates = new string[19, 19]; // setting up global variables
         static string[,] _player2Coordinates = new string[19, 19];
         static string[,] _chessBoard = CreateChessBoard();
-        static int _turnNumber = 0;
-        static string[,] _opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
-        static string[,] _currentPlayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
-        static bool _king1InCheck = false;
-        static bool _king2InCheck = false;
+        static int _turnNumber;
+        static string[,] _opponentCords;
+        static string[,] _currentPlayersCords;
+        static bool _king1InCheck;
+        static bool _king2InCheck;
 
         public static void Main(string[] args)
         {
@@ -174,42 +174,35 @@ namespace Jakub_Szewczyk_71695_Szachy
 
             while (gameRunning)
             {
-                int playerNumber = _turnNumber % 2 + 1;
-
-                
-                // Console.Clear();
-                Console.WriteLine($"It is player{playerNumber}'s turn! \n");
+                _opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
+                _currentPlayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
+                Console.WriteLine($"It is player{_turnNumber % 2 + 1}'s turn! \n");
                 PrintChessBoard(_chessBoard);
-                MakeAmove(playerNumber);
-                
+                MakeAMove();
+                Console.Clear();
                 _turnNumber++;
             }
         }
         
-        static void MakeAmove(int playerNumber)
+        static void MakeAMove()
         {
             while (true)
             {
                 int[] moveInIntArray = GetMoveFromPlayer();
                 string chosenPawn = _chessBoard[moveInIntArray[0], moveInIntArray[1]];
-                string[,] currentPlayersCoordinates = playerNumber == 1 ? _player1Coordinates : _player2Coordinates;
-                string[,] opponentCoordinates = playerNumber == 1 ? _player2Coordinates : _player1Coordinates;
                 
                 // if the pawn has a legal move, only then you can move it.
-                
-                if (PawnBelongsToPlayer(currentPlayersCoordinates, moveInIntArray) && 
+                if (PawnBelongsToPlayer(_currentPlayersCords, moveInIntArray) && 
                     PawnMoveIsLegal(moveInIntArray, chosenPawn))
                 {
-                    currentPlayersCoordinates[moveInIntArray[0], moveInIntArray[1]] = " ";
-                    currentPlayersCoordinates[moveInIntArray[2], moveInIntArray[3]] = "x";
+                    _currentPlayersCords[moveInIntArray[0], moveInIntArray[1]] = " ";
+                    _currentPlayersCords[moveInIntArray[2], moveInIntArray[3]] = "x";
 
-                    if (currentPlayersCoordinates[moveInIntArray[2], moveInIntArray[3]]
-                        == opponentCoordinates[moveInIntArray[2], moveInIntArray[3]])
+                    if (_currentPlayersCords[moveInIntArray[2], moveInIntArray[3]]
+                        == _opponentCords[moveInIntArray[2], moveInIntArray[3]])
                     {
-                        opponentCoordinates[moveInIntArray[2], moveInIntArray[3]] = " ";
+                        _opponentCords[moveInIntArray[2], moveInIntArray[3]] = " ";
                     }
-
-                    Console.WriteLine($"{moveInIntArray[0]} {moveInIntArray[1]} {moveInIntArray[2]} {moveInIntArray[3]}");
             
                     _chessBoard[moveInIntArray[0], moveInIntArray[1]] = " ";
                     _chessBoard[moveInIntArray[2], moveInIntArray[3]] = chosenPawn;
@@ -317,92 +310,25 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static bool PawnMoveIsLegal(int[] moveInIntArray, string pawn)
         {
-            string[,] opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
-            string[,] currentPLayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
-            int[] opponentKingPosition = new int[2];
+            int[] opponentKingsPosition = GetOpponentKingsCords();
+            CheckForACheck(attacksAfterMove, opponentKingsPosition);
             
             //for diagnostic purposes - print the possible moves table
-            // for (int row = 2; row <= 16; row += 2)
-            // {
-            //     for (int col = 2; col <= 16; col += 2)
-            //     {
-            //         if (possibleMoves[row, col] == "x") Console.Write("x");
-            //         else Console.Write("0");
-            //     }
-            //
-            //     Console.WriteLine();
-            // }
-            
-            //get the cords of the opponents King
             for (int row = 2; row <= 16; row += 2)
             {
                 for (int col = 2; col <= 16; col += 2)
                 {
-                    if (_chessBoard[row, col] == "K" && opponentCords[row, col] == "x")
-                    {
-                        opponentKingPosition[0] = row;
-                        opponentKingPosition[1] = col;
-                        break;
-                    }
+                    if (possibleMoves[row, col] == "x") Console.Write("x");
+                    else Console.Write("0");
                 }
+
+                Console.WriteLine();
             }
-            
-            if (pawn == "P")
-            {
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your Pawn! You cannot move there!");
-                return false;
-            }
-            if (pawn == "R")
-            {
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your Rook! You cannot move there!");
-                return false;
-            }
-            if (pawn == "N")
-            {
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[3], moveInIntArray[2]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your knight! You cannot move there!");
-                return false;
-            }
-            if (pawn == "B")
-            {
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
-                return false;
-            }
-            if (pawn == "Q")
-            {
-                //check for a check
-                if (attacksAfterMove[opponentKingPosition[0], opponentKingPosition[1]] == "x")
-                {
-                    if (_turnNumber % 2 == 0) _king2InCheck = true;
-                    else _king1InCheck = false;
-                }
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
-                return false;
-            }
-            if (pawn == "K")
-            {
-                //if the move is in the table with possible moves, then move
-                if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
-                //else:
-                Console.WriteLine("This move is out of bounds for your King! You cannot move there!");
-            }
-            return false;
+
+            //if the move is in the table with possible moves, then move
+            return possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x";
         }
 
         static string[,] GenerateTableWithPossibleMoves(int startingPosX, int startingPosY, string pawn)
@@ -770,6 +696,19 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
 
             return new int [2];
+        }
+
+        static void CheckForACheck(string[,] attacksAfterMove, int[] opponentKingsPosition)
+        {
+            if (attacksAfterMove[opponentKingsPosition[0], opponentKingsPosition[1]] == "x")
+            {
+                //by default, the King should not be in check
+                _king1InCheck = false;
+                _king2InCheck = false;
+                
+                if (_turnNumber % 2 == 0) _king2InCheck = true;
+                else if (_turnNumber % 2 == 1) _king1InCheck = true;
+            }
         }
     }
 }
