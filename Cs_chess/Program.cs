@@ -7,10 +7,11 @@ namespace Jakub_Szewczyk_71695_Szachy
     {
         static string[,] _player1Coordinates = new string[19, 19]; // setting up global variables
         static string[,] _player2Coordinates = new string[19, 19];
-        static string[,] _chessBoard = CreateChessBoard();
-        static int _turnNumber;
         static string[,] _opponentCords;
         static string[,] _currentPlayersCords;
+        static string[,] _dangerousFields;
+        static string[,] _chessBoard = CreateChessBoard();
+        static int _turnNumber;
         static bool _king1InCheck;
         static bool _king2InCheck;
 
@@ -156,6 +157,8 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static void GameSetup()
         {
+            _dangerousFields = new string[19,19];
+            
             PutPiecesOnChessBoard(_chessBoard);
 
             Console.WriteLine("Welcome to Jakub's fabulous game!");
@@ -268,11 +271,7 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static bool MoveIsLegal(string move)
         {
-            return MoveIsOnChessboard(move);
-        }
-
-        static bool MoveIsOnChessboard(string move)
-        {
+            //if there are too many characters in the entered move...
             if (move.Length > 4)
             {
                 Console.WriteLine($"Incorrect move! '{move}' has too many symbols!\n" +
@@ -281,7 +280,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                                   $": a2a4");
                 return false;
             }
-
+            //if the player entered something else than a letter or a number...
             for (int i = 0; i < move.Length; i++)
             {
                 int charToInt = move[i];
@@ -297,6 +296,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                     return false;
                 }
             }
+            
             return true;
         }
 
@@ -307,22 +307,37 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static bool PawnMoveIsLegal(int[] moveInIntArray, string pawn)
         {
+            //if there is a check, you can only move with your King
+            if (((_turnNumber % 2 == 0 && _king1InCheck) || 
+                 (_turnNumber % 2 == 1 && _king2InCheck)) && pawn != "K")
+            {
+                Console.WriteLine("There's a check! You have to move with your King!");
+                return false;
+            }
+            
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
             int[] opponentKingsPosition = GetOpponentKingsCords();
             
-            CheckForACheck(attacksAfterMove, opponentKingsPosition);
+            //TODO: create a function which keeps track of the dangerous fields
+            //TODO: remove those fields from the possibleMoves list for the King
+            //TODO: if the King doesn't have any possibleMoves and it's being attacked, it's a checkmate
+            //TODO: else, it's just a stalemate
             
-            //for diagnostic purposes - print the possible moves table
-            // for (int row = 2; row <= 16; row += 2)
-            // {
-            //     for (int col = 2; col <= 16; col += 2)
-            //     {
-            //         Console.Write(possibleMoves[row, col] == "x" ? "x" : "0");
-            //     }
-            //
-            //     Console.WriteLine();
-            // }
+            CheckForACheck(attacksAfterMove, opponentKingsPosition);
+            // TrackDangerousFields(attacksAfterMove, possibleMoves);
+            
+            // for diagnostic purposes - print the possible moves table
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    Console.Write(possibleMoves[row, col] == "x" ? "x" : "0");
+                }
+                
+                Console.WriteLine();
+            }
+            Console.WriteLine();
 
             //if the move is in the table with possible moves, then move
             return possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x";
@@ -367,37 +382,37 @@ namespace Jakub_Szewczyk_71695_Szachy
             if (pawn == "N")
             {
                 //generate table possibleMoves with every legal move
-                for (int row = startingPosX - 4; row <= startingPosX + 4; row++)
+                for (int col = startingPosX - 4; col <= startingPosX + 4; col++)
                 {
                     //if the rows are on the chessboard and there isn't an allied pawn there
-                    if (row >= 2 && row <= 16)
+                    if (col >= 2 && col <= 16)
                     {
                         //for the moves 2 places to the left
-                        if (row == startingPosX - 4)
+                        if (col == startingPosX - 4)
                         {
-                            if (startingPosY <= 14) possibleMoves[row, startingPosY + 2] = "x";
-                            if (startingPosY >= 4) possibleMoves[row, startingPosY - 2] = "x";
+                            if (startingPosY <= 14) possibleMoves[startingPosY + 2, col] = "x";
+                            if (startingPosY >= 4) possibleMoves[startingPosY - 2, col] = "x";
                         }
 
                         //for the moves 1 place to the left
-                        if (row == startingPosX - 2)
+                        if (col == startingPosX - 2)
                         {
-                            if (startingPosY <= 14) possibleMoves[row, startingPosY + 4] = "x";
-                            if (startingPosY >= 4) possibleMoves[row, startingPosY - 4] = "x";
+                            if (startingPosY <= 14) possibleMoves[startingPosY + 4, col] = "x";
+                            if (startingPosY >= 4) possibleMoves[startingPosY - 4, col] = "x";
                         }
 
                         //for the moves 2 places to the right
-                        if (row == startingPosX + 4)
+                        if (col == startingPosX + 4)
                         {
-                            if (startingPosY <= 14) possibleMoves[row, startingPosY + 2] = "x";
-                            if (startingPosY >= 4) possibleMoves[row, startingPosY - 2] = "x";
+                            if (startingPosY <= 14) possibleMoves[startingPosY + 2, col] = "x";
+                            if (startingPosY >= 4) possibleMoves[startingPosY - 2, col] = "x";
                         }
 
                         //for the moves 1 place to the right
-                        if (row == startingPosX + 2)
+                        if (col == startingPosX + 2)
                         {
-                            if (startingPosY <= 14) possibleMoves[row, startingPosY + 4] = "x";
-                            if (startingPosY >= 4) possibleMoves[row, startingPosY - 4] = "x";
+                            if (startingPosY <= 14) possibleMoves[startingPosY + 4, col] = "x";
+                            if (startingPosY >= 4) possibleMoves[startingPosY - 4, col] = "x";
                         }
                     }
                 }
@@ -697,14 +712,56 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static void CheckForACheck(string[,] attacksAfterMove, int[] opponentKingsPosition)
         {
+            //by default, the King should not be in check
+            _king1InCheck = false;
+            _king2InCheck = false;
+            
             if (attacksAfterMove[opponentKingsPosition[0], opponentKingsPosition[1]] == "x")
             {
-                //by default, the King should not be in check
-                _king1InCheck = false;
-                _king2InCheck = false;
-                
                 if (_turnNumber % 2 == 0) _king2InCheck = true;
                 else if (_turnNumber % 2 == 1) _king1InCheck = true;
+            }
+        }
+
+        static void TrackDangerousFields(string[,] attacksAfterMove, string[,] possibleMoves)
+        {
+            if (_turnNumber % 2 == 0)
+            {
+                //check every legal move for every pawn as and mark it as _dangerousFields
+                //for every pawn, generate every possible legal move
+                for (int row = 2; row <= 16; row += 2)
+                {
+                    for (int col = 2; col <= 16; col += 2)
+                    {
+                        //reset the _dangerousFields each turn
+                        _dangerousFields[row, col] = "";
+                        
+                        if (_currentPlayersCords[row, col] == "x")
+                        {
+                            string [,] moves = GenerateTableWithPossibleMoves(col, row, _chessBoard[row, col]);
+                            // add every possible move to _dangerousFields
+                             for (int row2 = 2; row2 <= 16; row2 += 2)
+                             {
+                                 for (int col2 = 2; col2 <= 16; col2 += 2)
+                                 {
+                                     if (moves[row2, col2] == "x") _dangerousFields[row2, col2] = "x";
+                                 }
+                             }
+                            
+                            // for diagnostic purposes - print the possible moves table
+                            // for (int row1 = 2; row1 <= 16; row1 += 2)
+                            // {
+                            //     for (int col2 = 2; col2 <= 16; col2 += 2)
+                            //     {
+                            //         Console.Write(moves[row1, col2] == "x" ? "x" : "0");
+                            //     }
+                            //
+                            //     Console.WriteLine();
+                            // }
+                            // Console.WriteLine();
+                        }
+                    }
+                }
             }
         }
     }
