@@ -183,8 +183,15 @@ namespace Jakub_Szewczyk_71695_Szachy
                 PrintChessBoard(_chessBoard);
                 MakeAMove();
                 Console.Clear();
+
+                if (IsCheckMate())
+                {
+                    break;
+                }
                 _turnNumber++;
             }
+
+            Console.WriteLine($"Player{_turnNumber % 2} wins!!!");
         }
         
         static void MakeAMove()
@@ -314,18 +321,18 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("There's a check! You have to move with your King!");
                 return false;
             }
+            //update the table with dangerous moves for the king
+            TrackDangerousFields();
             
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
             int[] opponentKingsPosition = GetOpponentKingsCords();
             
-            //TODO: create a function which keeps track of the dangerous fields
             //TODO: remove those fields from the possibleMoves list for the King
             //TODO: if the King doesn't have any possibleMoves and it's being attacked, it's a checkmate
             //TODO: else, it's just a stalemate
             
             CheckForACheck(attacksAfterMove, opponentKingsPosition);
-            // TrackDangerousFields(attacksAfterMove, possibleMoves);
             
             // for diagnostic purposes - print the possible moves table
             for (int row = 2; row <= 16; row += 2)
@@ -492,12 +499,16 @@ namespace Jakub_Szewczyk_71695_Szachy
                 if (startingPosY - 2 >= 2) possibleMoves[startingPosY - 2, startingPosX] = "x";
                 //make move down possible
                 if (startingPosY + 2 <= 16) possibleMoves[startingPosY + 2, startingPosX] = "x";
-                //check if there are allies in the legal fields - if yes, remove that field from the possibleMoves table
+                //remove additional fields from the possibleMoves table
                 for (int row = 2; row <= 16; row += 2)
                 {
                     for (int col = 2; col <= 16; col += 2)
                     {
+                        //remove fields with allied pieces
                         if (possibleMoves[row, col] == "x" && _currentPlayersCords[row, col] == "x")
+                            possibleMoves[row, col] = "";
+                        //remove dangerous fields
+                        if (possibleMoves[row, col] == "x" && _dangerousFields[row, col] == "x")
                             possibleMoves[row, col] = "";
                     }
                 }
@@ -723,46 +734,48 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
         }
 
-        static void TrackDangerousFields(string[,] attacksAfterMove, string[,] possibleMoves)
+        static void TrackDangerousFields()
         {
-            if (_turnNumber % 2 == 0)
+            //check every legal move for every pawn as and mark it as _dangerousFields
+            //for every pawn, generate every possible legal move
+            for (int row = 2; row <= 16; row += 2)
             {
-                //check every legal move for every pawn as and mark it as _dangerousFields
-                //for every pawn, generate every possible legal move
-                for (int row = 2; row <= 16; row += 2)
+                for (int col = 2; col <= 16; col += 2)
                 {
-                    for (int col = 2; col <= 16; col += 2)
+                    //reset the _dangerousFields each turn
+                    _dangerousFields[row, col] = "";
+                    //use the opponents pieces to check which fields are dangerous to the King
+                    if (_opponentCords[row, col] == "x")
                     {
-                        //reset the _dangerousFields each turn
-                        _dangerousFields[row, col] = "";
-                        
-                        if (_currentPlayersCords[row, col] == "x")
-                        {
-                            string [,] moves = GenerateTableWithPossibleMoves(col, row, _chessBoard[row, col]);
-                            // add every possible move to _dangerousFields
-                             for (int row2 = 2; row2 <= 16; row2 += 2)
+                        string [,] moves = GenerateTableWithPossibleMoves(col, row, _chessBoard[row, col]);
+                        // add every possible move to _dangerousFields
+                         for (int row2 = 2; row2 <= 16; row2 += 2)
+                         {
+                             for (int col2 = 2; col2 <= 16; col2 += 2)
                              {
-                                 for (int col2 = 2; col2 <= 16; col2 += 2)
-                                 {
-                                     if (moves[row2, col2] == "x") _dangerousFields[row2, col2] = "x";
-                                 }
+                                 if (moves[row2, col2] == "x") _dangerousFields[row2, col2] = "x";
                              }
-                            
-                            // for diagnostic purposes - print the possible moves table
-                            // for (int row1 = 2; row1 <= 16; row1 += 2)
-                            // {
-                            //     for (int col2 = 2; col2 <= 16; col2 += 2)
-                            //     {
-                            //         Console.Write(moves[row1, col2] == "x" ? "x" : "0");
-                            //     }
-                            //
-                            //     Console.WriteLine();
-                            // }
-                            // Console.WriteLine();
-                        }
+                         }
+                        
+                        // for diagnostic purposes - print the possible moves table
+                        // for (int row1 = 2; row1 <= 16; row1 += 2)
+                        // {
+                        //     for (int col2 = 2; col2 <= 16; col2 += 2)
+                        //     {
+                        //         Console.Write(moves[row1, col2] == "x" ? "x" : "0");
+                        //     }
+                        //
+                        //     Console.WriteLine();
+                        // }
+                        // Console.WriteLine();
                     }
                 }
             }
+        }
+
+        static bool IsCheckMate()
+        {
+            
         }
     }
 }
