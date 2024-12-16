@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace Jakub_Szewczyk_71695_Szachy
 {
@@ -356,7 +357,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("This move is out of bounds for your Pawn! You cannot move there!");
                 return false;
             }
-            else if (pawn == "R")
+            if (pawn == "R")
             {
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
@@ -364,7 +365,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("This move is out of bounds for your Rook! You cannot move there!");
                 return false;
             }
-            else if (pawn == "N")
+            if (pawn == "N")
             {
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[3], moveInIntArray[2]] == "x") return true;
@@ -372,7 +373,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("This move is out of bounds for your knight! You cannot move there!");
                 return false;
             }
-            else if (pawn == "B")
+            if (pawn == "B")
             {
                 //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
@@ -380,7 +381,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("This move is out of bounds for your Bishop! You cannot move there!");
                 return false;
             }
-            else if (pawn == "Q")
+            if (pawn == "Q")
             {
                 //check for a check
                 if (attacksAfterMove[opponentKingPosition[0], opponentKingPosition[1]] == "x")
@@ -394,44 +395,9 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("This move is out of bounds for your Queen! You cannot move there!");
                 return false;
             }
-            else if (pawn == "K")
+            if (pawn == "K")
             {
-                //check if the new x coordinate is in bounds of the board - right side
-                if (moveInIntArray[1] + 2 <= 16)
-                {
-                    //make move right possible
-                    possibleMoves[moveInIntArray[0], moveInIntArray[1] + 2] = "x";
-                    //make move right and up possible
-                    if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] + 2] = "x";
-                    //make move right and down possible
-                    if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] + 2] = "x";
-                }
-
-                //check if the new x coordinate is in bounds of the board - left side
-                if (moveInIntArray[1] - 2 >= 2)
-                {
-                    //make move left possible
-                    possibleMoves[moveInIntArray[0], moveInIntArray[1] - 2] = "x";
-                    //make move left and up possible
-                    if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1] - 2] = "x";
-                    //make move left and down possible
-                    if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1] - 2] = "x";
-                }
-
-                //make move up possible
-                if (moveInIntArray[0] - 2 >= 2) possibleMoves[moveInIntArray[0] - 2, moveInIntArray[1]] = "x";
-                //make move down possible
-                if (moveInIntArray[0] + 2 <= 16) possibleMoves[moveInIntArray[0] + 2, moveInIntArray[1]] = "x";
-                //check if there are allies in the legal fields - if yes, remove that field from the possibleMoves table
-                for (int row = 2; row <= 16; row += 2)
-                {
-                    for (int col = 2; col <= 16; col += 2)
-                    {
-                        if (possibleMoves[row, col] == "x" && currentPLayersCords[row, col] == "x")
-                            possibleMoves[row, col] = "";
-                    }
-                }
-
+                //if the move is in the table with possible moves, then move
                 if (possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x") return true;
                 //else:
                 Console.WriteLine("This move is out of bounds for your King! You cannot move there!");
@@ -442,12 +408,12 @@ namespace Jakub_Szewczyk_71695_Szachy
         static string[,] GenerateTableWithPossibleMoves(int startingPosX, int startingPosY, string pawn)
         {
             string[,] possibleMoves = new string[19, 19];
-            
+
             if (pawn == "Q")
             {
-                
+
                 //generate all possible moves in horizontal and vertical lines
-                string[,] possibleMoves1 = 
+                string[,] possibleMoves1 =
                     GenerateHorizontalAndVerticalMoves(startingPosX, startingPosY);
                 //generate all possible moves in diagonal lines
                 string[,] possibleMoves2 =
@@ -512,6 +478,7 @@ namespace Jakub_Szewczyk_71695_Szachy
                         }
                     }
                 }
+
                 //eliminate the moves which land on an ally
                 for (int row = 2; row <= 16; row++)
                 {
@@ -525,30 +492,76 @@ namespace Jakub_Szewczyk_71695_Szachy
 
             if (pawn == "P")
             {
-                int rowDifference = Math.Abs(moveInIntArray[0] - moveInIntArray[2]);
-                int columnDifference = Math.Abs(moveInIntArray[1] - moveInIntArray[3]);
-                
-                //checking if the pawn doesn't move backwards - for player1 the difference should be negative
-                if ((_turnNumber % 2 == 0 && moveInIntArray[2] - moveInIntArray[0] < 0)
-                    || (_turnNumber % 2 == 1 && moveInIntArray[2] - moveInIntArray[0] > 0))
+                //if it's the player1's turn:
+                if (_turnNumber % 2 == 0)
                 {
-                    if (
-                        rowDifference <= 4 //if the pawn wants tp move two tiles
-                        && (moveInIntArray[0] == 14 ||
-                            moveInIntArray[0] == 4) //and it's on the correct starting position
-                        && columnDifference == 0 //and it doesn't want to move sideways
-                    )
-                        
-                    if (
-                        rowDifference == 2
-                        && (
-                            (columnDifference == 0
-                             && _player1Coordinates[moveInIntArray[2], moveInIntArray[3]] != "x"
-                             && _player2Coordinates[moveInIntArray[2], moveInIntArray[3]] != "x")
-                            ||
-                            (columnDifference == 2
-                             && opponentCords[moveInIntArray[2], moveInIntArray[3]] == "x"))
-                    )
+                    if (startingPosY > 2)
+                    {
+                        //by default, each pawn can move 1 tile up
+                        possibleMoves[startingPosY - 2, startingPosX] = "x";
+                        //if the pawn is on it's starting position it can move 2 tiles
+                        if (startingPosY == 14) possibleMoves[startingPosY - 4, startingPosX] = "x";
+                        //if there's a pawn on a diagonal next to the pawn, make that move possible
+                        if (_opponentCords[startingPosY - 2, startingPosX - 2] == "x") 
+                            possibleMoves[startingPosY - 2, startingPosX - 2] = "x";
+                        if (_opponentCords[startingPosY - 2, startingPosX + 2] == "x")
+                            possibleMoves[startingPosY - 2, startingPosX + 2] = "x";
+                    }
+                }
+                //if it's the player2's turn:
+                else
+                {
+                    if (startingPosY < 16)
+                    {
+                        //by default, each pawn can move 1 tile down
+                        possibleMoves[startingPosY + 2, startingPosX] = "x";
+                        //if the pawn is on it's starting position it can move 2 tiles
+                        if (startingPosY == 4) possibleMoves[startingPosY + 4, startingPosX] = "x";
+                        //if there's a pawn on a diagonal next to the pawn, make that move possible
+                        if (_opponentCords[startingPosY + 2, startingPosX - 2] == "x") 
+                            possibleMoves[startingPosY + 2, startingPosX - 2] = "x";
+                        if (_opponentCords[startingPosY + 2, startingPosX + 2] == "x") 
+                            possibleMoves[startingPosY + 2, startingPosX + 2] = "x";
+                    }
+                }
+            }
+
+            if (pawn == "K")
+            {
+                //check if the new x coordinate is in bounds of the board - right side
+                if (startingPosX + 2 <= 16)
+                {
+                    //make move right possible
+                    possibleMoves[startingPosY, startingPosX + 2] = "x";
+                    //make move right and up possible
+                    if (startingPosY - 2 >= 2) possibleMoves[startingPosY - 2, startingPosX + 2] = "x";
+                    //make move right and down possible
+                    if (startingPosY + 2 <= 16) possibleMoves[startingPosY + 2, startingPosX + 2] = "x";
+                }
+
+                //check if the new x coordinate is in bounds of the board - left side
+                if (startingPosX - 2 >= 2)
+                {
+                    //make move left possible
+                    possibleMoves[startingPosY, startingPosX - 2] = "x";
+                    //make move left and up possible
+                    if (startingPosY - 2 >= 2) possibleMoves[startingPosY - 2, startingPosX - 2] = "x";
+                    //make move left and down possible
+                    if (startingPosY + 2 <= 16) possibleMoves[startingPosY + 2, startingPosX - 2] = "x";
+                }
+
+                //make move up possible
+                if (startingPosY - 2 >= 2) possibleMoves[startingPosY - 2, startingPosX] = "x";
+                //make move down possible
+                if (startingPosY + 2 <= 16) possibleMoves[startingPosY + 2, startingPosX] = "x";
+                //check if there are allies in the legal fields - if yes, remove that field from the possibleMoves table
+                for (int row = 2; row <= 16; row += 2)
+                {
+                    for (int col = 2; col <= 16; col += 2)
+                    {
+                        if (possibleMoves[row, col] == "x" && _currentPlayersCords[row, col] == "x")
+                            possibleMoves[row, col] = "";
+                    }
                 }
             }
             
@@ -743,6 +756,20 @@ namespace Jakub_Szewczyk_71695_Szachy
             }
 
             return possibleMoves;
+        }
+
+        static int[] GetOpponentKingsCords()
+        {
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    if (_chessBoard[row, col] == "K" && _opponentCords[row, col] == "x")
+                        return new [] {row, col};
+                }
+            }
+
+            return new int [2];
         }
     }
 }
