@@ -173,9 +173,7 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static void GameRunning()
         {
-            bool gameRunning = true;
-
-            while (gameRunning)
+            while (true)
             {
                 _opponentCords = _turnNumber % 2 == 0 ? _player2Coordinates : _player1Coordinates;
                 _currentPlayersCords = _turnNumber % 2 == 0 ? _player1Coordinates : _player2Coordinates;
@@ -183,12 +181,8 @@ namespace Jakub_Szewczyk_71695_Szachy
                 PrintChessBoard(_chessBoard);
                 MakeAMove();
                 Console.Clear();
-
-                if (IsCheckMate())
-                {
-                    break;
-                }
                 _turnNumber++;
+                if (IsCheckMate()) break;
             }
 
             Console.WriteLine($"Player{_turnNumber % 2} wins!!!");
@@ -321,30 +315,18 @@ namespace Jakub_Szewczyk_71695_Szachy
                 Console.WriteLine("There's a check! You have to move with your King!");
                 return false;
             }
-            //update the table with dangerous moves for the king
-            TrackDangerousFields();
             
             string[,] possibleMoves = GenerateTableWithPossibleMoves(moveInIntArray[1], moveInIntArray[0], pawn);
             string[,] attacksAfterMove = GenerateTableWithPossibleMoves(moveInIntArray[3], moveInIntArray[2], pawn);
-            int[] opponentKingsPosition = GetOpponentKingsCords();
+            int[] opponentKingsPosition = GetKingsCords(_opponentCords);
             
-            //TODO: remove those fields from the possibleMoves list for the King
             //TODO: if the King doesn't have any possibleMoves and it's being attacked, it's a checkmate
             //TODO: else, it's just a stalemate
             
             CheckForACheck(attacksAfterMove, opponentKingsPosition);
             
             // for diagnostic purposes - print the possible moves table
-            for (int row = 2; row <= 16; row += 2)
-            {
-                for (int col = 2; col <= 16; col += 2)
-                {
-                    Console.Write(possibleMoves[row, col] == "x" ? "x" : "0");
-                }
-                
-                Console.WriteLine();
-            }
-            Console.WriteLine();
+            PrintOutTable(possibleMoves);
 
             //if the move is in the table with possible moves, then move
             return possibleMoves[moveInIntArray[2], moveInIntArray[3]] == "x";
@@ -505,7 +487,8 @@ namespace Jakub_Szewczyk_71695_Szachy
                     for (int col = 2; col <= 16; col += 2)
                     {
                         //remove fields with allied pieces
-                        if (possibleMoves[row, col] == "x" && _currentPlayersCords[row, col] == "x")
+                        //TODO: change the player2coordinates to currentPlayersCords and make it work
+                        if (possibleMoves[row, col] == "x" && _player2Coordinates[row, col] == "x")
                             possibleMoves[row, col] = "";
                         //remove dangerous fields
                         if (possibleMoves[row, col] == "x" && _dangerousFields[row, col] == "x")
@@ -707,13 +690,13 @@ namespace Jakub_Szewczyk_71695_Szachy
             return possibleMoves;
         }
 
-        static int[] GetOpponentKingsCords()
+        static int[] GetKingsCords(string[,] whichPlayersKing)
         {
             for (int row = 2; row <= 16; row += 2)
             {
                 for (int col = 2; col <= 16; col += 2)
                 {
-                    if (_chessBoard[row, col] == "K" && _opponentCords[row, col] == "x")
+                    if (_chessBoard[row, col] == "K" && whichPlayersKing[row, col] == "x")
                         return new [] {row, col};
                 }
             }
@@ -745,7 +728,8 @@ namespace Jakub_Szewczyk_71695_Szachy
                     //reset the _dangerousFields each turn
                     _dangerousFields[row, col] = "";
                     //use the opponents pieces to check which fields are dangerous to the King
-                    if (_opponentCords[row, col] == "x")
+                    //TODO: change player1Cords to universal opponentsCords and make it work
+                    if (_player1Coordinates[row, col] == "x")
                     {
                         string [,] moves = GenerateTableWithPossibleMoves(col, row, _chessBoard[row, col]);
                         // add every possible move to _dangerousFields
@@ -756,18 +740,6 @@ namespace Jakub_Szewczyk_71695_Szachy
                                  if (moves[row2, col2] == "x") _dangerousFields[row2, col2] = "x";
                              }
                          }
-                        
-                        // for diagnostic purposes - print the possible moves table
-                        // for (int row1 = 2; row1 <= 16; row1 += 2)
-                        // {
-                        //     for (int col2 = 2; col2 <= 16; col2 += 2)
-                        //     {
-                        //         Console.Write(moves[row1, col2] == "x" ? "x" : "0");
-                        //     }
-                        //
-                        //     Console.WriteLine();
-                        // }
-                        // Console.WriteLine();
                     }
                 }
             }
@@ -775,7 +747,53 @@ namespace Jakub_Szewczyk_71695_Szachy
 
         static bool IsCheckMate()
         {
-            
+            //update the table with dangerous moves for the king
+            TrackDangerousFields();
+            bool isMovePossible = false;
+            int[] player2KingsCords = GetKingsCords(_player2Coordinates);
+            //generate a table with moves for the king
+            //TODO: change the player2KingsCords to a universal variable
+            string[,] kingMoves = GenerateTableWithPossibleMoves(player2KingsCords[1], player2KingsCords[0], "K");
+            //for diagnostic purposes print out KingMoves
+            PrintOutTable(kingMoves);
+            //check if there aren't any moves for the King and is he's under attack
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    if (kingMoves[row, col] == "x")
+                    {
+                        isMovePossible = true;
+                        Console.WriteLine($"King move is possible to {row},{col}");
+                        break;
+                    }
+                }
+                
+                if (isMovePossible) break;
+            }
+            // for diagnostic purposes - print the dangerousFields table
+            PrintOutTable(_dangerousFields);
+
+            if (!isMovePossible && _dangerousFields[player2KingsCords[0], player2KingsCords[1]] == "x")
+            {
+                return true;
+            }
+            return false;
+        }
+        
+        //for diagnostic purposes - to print out a table
+        static void PrintOutTable(string[,] table)
+        {
+            Console.WriteLine();
+            for (int row = 2; row <= 16; row += 2)
+            {
+                for (int col = 2; col <= 16; col += 2)
+                {
+                    Console.Write(table[row, col] == "x" ? "x":"0");
+                }
+
+                Console.WriteLine();
+            }
         }
     }
 }
